@@ -28,6 +28,8 @@ GOLD = colors.HexColor("#A9824C")
 CORAL = colors.HexColor("#D24A2E")
 MUTED = colors.HexColor("#5A6470")
 RULE = colors.HexColor("#D9D6CC")
+# Contour extérieur et graduations du radar (instrument de mesure, docs/design/DIRECTION.md).
+RADAR_OUTER = colors.HexColor("#A3A8AC")
 PAPER = colors.HexColor("#FAF8F2")
 WHITE = colors.white
 
@@ -147,23 +149,28 @@ def _radar(domain_scores: dict) -> Drawing:
 
     for ring in (0.25, 0.5, 0.75, 1.0):
         points = [c for i in range(5) for c in _pentagon_point(cx, cy, radius * ring, i)]
-        drawing.add(Polygon(points, fillColor=None, strokeColor=RULE, strokeWidth=0.6))
+        outline = RADAR_OUTER if ring == 1.0 else RULE
+        drawing.add(Polygon(points, fillColor=None, strokeColor=outline, strokeWidth=0.6))
     for i in range(5):
         x, y = _pentagon_point(cx, cy, radius, i)
         drawing.add(Line(cx, cy, x, y, strokeColor=RULE, strokeWidth=0.6))
+        # Graduations d'instrument tous les 10 points (même signature que l'écran de résultats).
+        for tick in range(1, 10):
+            tx, ty = _pentagon_point(cx, cy, radius * tick / 10, i)
+            drawing.add(Circle(tx, ty, 0.75 if tick == 5 else 0.4, fillColor=RADAR_OUTER, strokeColor=None))
 
-    shape = []
+    shape = [c for i, domain_id in enumerate(domain_ids[:5])
+             for c in _pentagon_point(cx, cy, radius * domain_scores[domain_id] / 100, i)]
+    drawing.add(Polygon(shape, fillColor=colors.Color(10 / 255, 125 / 255, 104 / 255, alpha=0.14),
+                        strokeColor=EMERALD, strokeWidth=1.4, strokeLineJoin=1))
     for i, domain_id in enumerate(domain_ids[:5]):
         x, y = _pentagon_point(cx, cy, radius * domain_scores[domain_id] / 100, i)
-        shape.extend([x, y])
-        drawing.add(Circle(x, y, 2.4, fillColor=EMERALD, strokeColor=None))
+        drawing.add(Circle(x, y, 2.2, fillColor=colors.white, strokeColor=EMERALD, strokeWidth=1.1))
         lx, ly = _pentagon_point(cx, cy, radius + 20, i)
         drawing.add(String(lx, ly + 2, RADAR_LABELS_FR.get(domain_id, domain_id), textAnchor="middle",
                            fontName="Courier", fontSize=6.5, fillColor=MUTED))
         drawing.add(String(lx, ly - 7, f"{domain_scores[domain_id]:.0f}", textAnchor="middle",
                            fontName="Courier-Bold", fontSize=8, fillColor=_score_color(domain_scores[domain_id])))
-    drawing.add(Polygon(shape, fillColor=colors.Color(10 / 255, 125 / 255, 104 / 255, alpha=0.16),
-                        strokeColor=EMERALD, strokeWidth=1.4))
     return drawing
 
 
@@ -329,6 +336,10 @@ def _consistency_paragraphs(checks: list, styles) -> list:
 def _footer(report_id: str):
     def draw(canvas, doc) -> None:
         canvas.saveState()
+        # Filet de relevé, comme l'en-tête de l'écran de résultats.
+        canvas.setStrokeColor(RULE)
+        canvas.setLineWidth(0.5)
+        canvas.line(doc.leftMargin, 0.95 * cm, A4[0] - doc.rightMargin, 0.95 * cm)
         canvas.setFont("Courier", 7)
         canvas.setFillColor(MUTED)
         canvas.drawString(doc.leftMargin, 0.55 * cm, f"Pentascore · Réf. {report_id}")

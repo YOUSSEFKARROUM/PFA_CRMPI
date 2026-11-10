@@ -81,7 +81,11 @@
   gap: 3px;
   background: transparent;
   color: var(--color-ink);
-  transition: background var(--duration-fast) ease;
+  transition: background var(--duration-base) var(--ease-out), color var(--duration-base) ease;
+}
+
+.mode-option:hover:not(.is-selected) {
+  background: rgba(16, 32, 47, 0.04);
 }
 
 .mode-option:focus-within {

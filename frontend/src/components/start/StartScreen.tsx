@@ -1,3 +1,6 @@
+import type { CSSProperties } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { ICON_STROKE } from '../common/DomainIcon';
 import type { DemoProfile } from '../../api/types';
 import { formatScore, levelTone } from '../../lib/maturity';
 import type { Mode } from '../../state/assessment';
@@ -28,13 +31,15 @@ export function StartScreen(props: StartScreenProps) {
   return (
     <section className="page start" aria-labelledby="start-title">
       <div className="start-main">
-        <div className="eyebrow">Avant de commencer</div>
-        <h1 id="start-title">Deux informations, puis vous répondez.</h1>
-        <p className="lede">
+        <div className="eyebrow reveal">Avant de commencer</div>
+        <h1 id="start-title" className="reveal" style={{ '--i': 1 } as CSSProperties}>
+          Deux informations, puis vous répondez.
+        </h1>
+        <p className="lede reveal" style={{ '--i': 2 } as CSSProperties}>
           Elles figurent sur votre rapport PDF. Sans compte, aucune réponse n’est enregistrée sur le serveur.
         </p>
 
-        <div className="start-form">
+        <div className="start-form reveal" style={{ '--i': 3 } as CSSProperties}>
           <label className="field">
             <span className="label">Organisation (facultatif)</span>
             <input
@@ -78,13 +83,14 @@ export function StartScreen(props: StartScreenProps) {
             </div>
           </fieldset>
 
-          <button type="button" className="btn-primary start-submit" onClick={onStart}>
+          <button type="button" className="btn-primary btn-icon btn-arrow start-submit" onClick={onStart}>
             Commencer l’évaluation
+            <ArrowRight size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      <aside className="start-demos" aria-labelledby="demos-title">
+      <aside className="start-demos reveal" style={{ '--i': 4 } as CSSProperties} aria-labelledby="demos-title">
         <span id="demos-title" className="label">
           Ou charger un profil de démonstration
         </span>

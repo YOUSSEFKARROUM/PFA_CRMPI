@@ -33,6 +33,7 @@ réalisé par un expert. Cette limite est affichée sur l'écran de résultats e
 | Replay du score (`scoring.get_score_contributions`) | Panneau « Voir ce qui a le plus pesé sur votre score » : les 5 réponses qui ont coûté le plus de points. Chaque question pèse 4 points sur 100 ; la somme des points perdus vaut exactement 100 − score (vérifié par les tests) | Tous les domaines : comprendre et expliquer le score |
 | QR code de réévaluation (`pdf_generator.qr_drawing`, `PENTASCORE_BASE_URL`) | QR code vectoriel généré en mémoire par ReportLab en page 1 du rapport, avec « Refaites votre évaluation dans 6 mois » ; un test décode le QR rendu pour vérifier l'URL | Gouvernance : amélioration continue (réévaluation périodique) |
 | Fonctionnement hors connexion (`@fontsource/*`, CSP) | Polices de l'interface et du badge embarquées (licence OFL) : plus aucun appel à Google Fonts, CSP limitée à `'self'` ; un test E2E vérifie qu'aucune requête ne sort vers un domaine extérieur | Démonstration fiable sans réseau |
+| Design « relevé de précision » (`docs/design/`, `lucide-react`) | Révélation chorégraphiée du résultat (radar gradué tracé, score, sceau de niveau), landing animée au défilement, questionnaire avec échelle graduée et raccourcis 1–5, historique avec courbe et pentagones avant/après ; même signature sur le PDF et le badge. `prefers-reduced-motion` respecté, aucune ressource distante | Crédibilité et lisibilité du résultat ; démonstration marquante |
 
 ## Références
 
@@ -106,12 +107,12 @@ cd frontend && npm run dev                     # terminal 2 → http://localhost
 
 ```bash
 pip install -r requirements-dev.txt
-pytest --cov=src --cov=api                     # backend : 285 tests, 97 % de couverture
+pytest --cov=src --cov=api                     # backend : 285 tests, 98 % de couverture
 flake8 src api tests scripts
 
 cd frontend
 npm run typecheck && npm run lint
-npm run test:coverage                          # frontend : 57 tests unitaires, 97 % de couverture
+npm run test:coverage                          # frontend : 71 tests unitaires, 98 % de couverture
 npm run test:e2e                               # Playwright : 13 parcours dans un vrai navigateur
 ```
 

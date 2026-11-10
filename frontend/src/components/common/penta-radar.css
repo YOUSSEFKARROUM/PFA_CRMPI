@@ -16,21 +16,52 @@
   stroke-width: 1;
 }
 
+.radar-ring--outer {
+  stroke: rgba(16, 32, 47, 0.3);
+}
+
+/* Tracé progressif (pathLength = 1) : la grille se dessine, anneau après anneau. */
+.radar-ring--draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: radar-draw var(--duration-reveal) var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+@keyframes radar-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.radar-tick {
+  fill: rgba(16, 32, 47, 0.32);
+}
+
+.penta-radar--animated .radar-tick {
+  animation: reveal-rise var(--duration-slow) var(--ease-out) 400ms both;
+}
+
 .radar-shape {
   fill: var(--color-emerald);
-  fill-opacity: 0.16;
+  fill-opacity: 0.14;
   stroke: var(--color-emerald);
   stroke-width: 2;
   stroke-linejoin: round;
 }
 
 .radar-dot {
-  fill: var(--color-emerald);
+  fill: var(--color-paper);
+  stroke: var(--color-emerald);
+  stroke-width: 2;
 }
 
 .radar-label {
   position: absolute;
   transform: translate(-50%, -50%);
+}
+
+.radar-label > span {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,4 +79,31 @@
 .radar-label-value {
   font-size: 14px;
   font-weight: 600;
+}
+
+.radar-dot {
+  transition: r var(--duration-base) var(--ease-spring);
+}
+
+.radar-spoke--active {
+  stroke: var(--color-emerald);
+  stroke-width: 1.5;
+}
+
+.radar-label-name,
+.radar-label-value {
+  transition: color var(--duration-fast) ease;
+}
+
+.radar-label--active .radar-label-name {
+  color: var(--color-emerald);
+}
+
+/* Forme de comparaison (historique) : première évaluation, en pointillés. */
+.radar-compare {
+  fill: rgba(16, 32, 47, 0.04);
+  stroke: var(--color-ink-55);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  stroke-linejoin: round;
 }

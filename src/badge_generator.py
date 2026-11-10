@@ -10,7 +10,7 @@ import math
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from src.pdf_generator import MATURITY_HEADLINES_FR
 
@@ -33,6 +33,9 @@ PAPER = (250, 248, 242)
 INK = (16, 32, 47)
 MUTED = (90, 100, 112)
 RULE = (217, 214, 204)
+RADAR_OUTER = (163, 168, 172)
+GRID = (229, 226, 216)
+GRID_STEP = 48
 EMERALD = (10, 125, 104)
 GOLD = (169, 130, 76)
 CORAL = (210, 74, 46)
@@ -73,10 +76,33 @@ def _pentagon(radius: float) -> list:
     ]
 
 
+def _draw_grid(image: Image.Image) -> None:
+    """
+    Trame de relevé technique autour du pentagone, estompée vers les bords par un masque
+    radial (direction « Cartographie de précision », comme l'écran de résultats).
+    """
+    left, top, right, bottom = MARGIN, 190, BADGE_SIZE - MARGIN, 870
+    layer = Image.new("RGB", (right - left, bottom - top), PAPER)
+    draw = ImageDraw.Draw(layer)
+    for x in range(0, layer.width, GRID_STEP):
+        draw.line((x, 0, x, layer.height), fill=GRID, width=1)
+    for y in range(0, layer.height, GRID_STEP):
+        draw.line((0, y, layer.width, y), fill=GRID, width=1)
+    fade = ImageOps.invert(Image.radial_gradient("L")).resize(layer.size)
+    image.paste(layer, (left, top), fade)
+
+
 def _draw_signature(draw: ImageDraw.ImageDraw, score: float, tone: tuple) -> None:
-    """Pentagone signature : anneaux à 25/50/75/100, surface proportionnelle au score."""
+    """Pentagone signature : anneaux à 25/50/75/100, axes gradués, surface proportionnelle au score."""
     for ring in (0.25, 0.5, 0.75, 1.0):
-        draw.polygon(_pentagon(PENTAGON_RADIUS * ring), outline=RULE, width=3)
+        draw.polygon(_pentagon(PENTAGON_RADIUS * ring), outline=RADAR_OUTER if ring == 1.0 else RULE, width=3)
+    cx, cy = PENTAGON_CENTER
+    for vx, vy in _pentagon(PENTAGON_RADIUS):
+        draw.line((cx, cy, vx, vy), fill=RULE, width=2)
+        for tick in range(1, 10):
+            tx, ty = cx + (vx - cx) * tick / 10, cy + (vy - cy) * tick / 10
+            r = 4 if tick == 5 else 2.5
+            draw.ellipse((tx - r, ty - r, tx + r, ty + r), fill=RADAR_OUTER)
     filled = _pentagon(PENTAGON_RADIUS * max(0.06, min(score, 100) / 100))
     wash = tuple(int(c + (255 - c) * 0.82) for c in tone)
     draw.polygon(filled, fill=wash, outline=tone, width=6)
@@ -105,6 +131,7 @@ def generate_badge(
               fill=EMERALD, anchor="ls")
     draw.rectangle((MARGIN, 168, BADGE_SIZE - MARGIN, 170), fill=RULE)
 
+    _draw_grid(image)
     _draw_signature(draw, float(global_score), tone)
     score_font, max_font = load_font(SCORE_FONT, 190), load_font(SCORE_FONT, 44)
     score_text = score_label(global_score)

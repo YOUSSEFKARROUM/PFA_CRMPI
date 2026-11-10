@@ -1,5 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type CSSProperties, type FormEvent } from 'react';
+import { Eye, EyeOff, History, LoaderCircle, ShieldCheck, TrendingUp } from 'lucide-react';
 import { api } from '../../api/client';
+import { ICON_STROKE } from '../common/DomainIcon';
 import type { Account } from '../../api/types';
 import { SECTORS } from '../start/StartScreen';
 import './account.css';
@@ -15,6 +17,12 @@ interface AccountScreenProps {
 
 const MIN_PASSWORD = 8;
 
+const BENEFITS = [
+  { icon: History, text: 'Chaque évaluation enregistrée, datée et comparable.' },
+  { icon: TrendingUp, text: 'Votre progression domaine par domaine, d’une évaluation à l’autre.' },
+  { icon: ShieldCheck, text: 'Vos données supprimables à tout moment, en un clic (loi 09-08).' },
+];
+
 export function AccountScreen({ defaultOrganization, defaultSector, onAuthenticated, onCancel }: AccountScreenProps) {
   const [tab, setTab] = useState<Tab>('register');
   const [email, setEmail] = useState('');
@@ -24,6 +32,7 @@ export function AccountScreen({ defaultOrganization, defaultSector, onAuthentica
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setBusy] = useState(false);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   const isRegister = tab === 'register';
   const canSubmit = email.length > 0 && password.length >= MIN_PASSWORD && (!isRegister || (consent && organization.trim().length >= 2));
@@ -47,17 +56,29 @@ export function AccountScreen({ defaultOrganization, defaultSector, onAuthentica
 
   return (
     <section className="page account" aria-labelledby="account-title">
-      <div className="account-intro">
-        <div className="eyebrow">Mon espace</div>
-        <h1 id="account-title">Suivre votre maturité dans le temps.</h1>
-        <p className="lede">
+      <div className="account-intro surface-grid">
+        <div className="eyebrow reveal">Mon espace</div>
+        <h1 id="account-title" className="reveal" style={{ '--i': 1 } as CSSProperties}>
+          Suivre votre maturité dans le temps.
+        </h1>
+        <p className="lede reveal" style={{ '--i': 2 } as CSSProperties}>
           Un compte permet d’enregistrer vos évaluations et de mesurer votre progression. Il est facultatif : le
           questionnaire, le score et le rapport PDF restent accessibles sans compte.
         </p>
+        <ul className="account-benefits">
+          {BENEFITS.map(({ icon: Icon, text }, i) => (
+            <li key={text} className="reveal" style={{ '--i': i + 3 } as CSSProperties}>
+              <span className="benefit-icon" aria-hidden="true">
+                <Icon size={18} strokeWidth={ICON_STROKE} />
+              </span>
+              {text}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <form className="account-form" onSubmit={handleSubmit} noValidate>
-        <div className="account-tabs" role="tablist">
+      <form className="account-form reveal" style={{ '--i': 2 } as CSSProperties} onSubmit={handleSubmit} noValidate>
+        <div className="account-tabs" role="tablist" data-tab={tab}>
           <button type="button" role="tab" aria-selected={isRegister} onClick={() => setTab('register')}>
             Créer un compte
           </button>
@@ -70,10 +91,13 @@ export function AccountScreen({ defaultOrganization, defaultSector, onAuthentica
           <span className="label">Email professionnel</span>
           <input type="email" autoComplete="email" required maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
-        <label className="field">
-          <span className="label">Mot de passe ({MIN_PASSWORD} caractères minimum)</span>
+        <div className="field field-password">
+          <label className="label" htmlFor="account-password">
+            Mot de passe ({MIN_PASSWORD} caractères minimum)
+          </label>
           <input
-            type="password"
+            id="account-password"
+            type={isPasswordVisible ? 'text' : 'password'}
             autoComplete={isRegister ? 'new-password' : 'current-password'}
             required
             minLength={MIN_PASSWORD}
@@ -81,7 +105,24 @@ export function AccountScreen({ defaultOrganization, defaultSector, onAuthentica
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </label>
+          <button
+            type="button"
+            className="password-toggle"
+            aria-pressed={isPasswordVisible}
+            title={isPasswordVisible ? 'Masquer les caractères' : 'Afficher les caractères'}
+            onClick={() => setPasswordVisible((visible) => !visible)}
+          >
+            {isPasswordVisible
+              ? <EyeOff size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              : <Eye size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}
+            <span className="visually-hidden">{isPasswordVisible ? 'Masquer les caractères' : 'Afficher les caractères'}</span>
+          </button>
+          {isRegister && (
+            <span className="password-meter" aria-hidden="true">
+              <i style={{ transform: `scaleX(${Math.min(1, password.length / (MIN_PASSWORD * 2))})` }} />
+            </span>
+          )}
+        </div>
 
         {isRegister && (
           <>
@@ -115,7 +156,8 @@ export function AccountScreen({ defaultOrganization, defaultSector, onAuthentica
         {error && <p className="alert" role="alert">{error}</p>}
 
         <div className="account-actions">
-          <button type="submit" className="btn-primary" disabled={!canSubmit || isBusy}>
+          <button type="submit" className="btn-primary btn-icon" disabled={!canSubmit || isBusy}>
+            {isBusy && <LoaderCircle size={18} strokeWidth={ICON_STROKE} className="icon-spin" aria-hidden="true" />}
             {isBusy ? 'Patientez…' : isRegister ? 'Créer mon compte' : 'Se connecter'}
           </button>
           <button type="button" className="btn-link" onClick={onCancel}>

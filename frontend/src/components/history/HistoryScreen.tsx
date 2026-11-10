@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { ApiError, api } from '../../api/client';
 import type { Account, HistoryEntry } from '../../api/types';
 import { formatDate, formatDelta, formatScore, levelTone } from '../../lib/maturity';
+import { ICON_STROKE } from '../common/DomainIcon';
+import { PentaRadar } from '../common/PentaRadar';
 import { HistoryChart } from './HistoryChart';
 import './history.css';
 
 interface HistoryScreenProps {
   account: Account;
   canGoBackToResults: boolean;
+  /** Libellés courts des domaines (radar de comparaison). */
+  domainShort?: Readonly<Record<string, string>>;
   onBack: () => void;
   onStart: () => void;
   onLoggedOut: () => void;
@@ -18,8 +23,53 @@ type Load = { kind: 'loading' } | { kind: 'ready'; entries: HistoryEntry[] } | {
 
 const errorMessage = (e: unknown) => (e instanceof Error ? e.message : 'Une erreur est survenue.');
 
+/** Sens de l'évolution entre deux évaluations : icône et ton (la couleur n'est jamais seule porteuse du sens). */
+function DeltaMark({ current, previous }: { current: number; previous: number | undefined }) {
+  if (previous === undefined) return <span className="data history-delta">—</span>;
+  const delta = Math.round(current - previous);
+  const Icon = delta > 0 ? TrendingUp : delta < 0 ? TrendingDown : Minus;
+  const tone = delta > 0 ? 'is-up' : delta < 0 ? 'is-down' : '';
+  return (
+    <span className={`data history-delta ${tone}`}>
+      <Icon size={14} strokeWidth={ICON_STROKE} aria-hidden="true" />
+      {formatDelta(current, previous)}
+    </span>
+  );
+}
+
+/** Comparaison des pentagones : première évaluation (pointillés) et dernière (pleine). */
+function HistoryCompare({ first, last, domainShort }: {
+  first: HistoryEntry; last: HistoryEntry; domainShort: Readonly<Record<string, string>>;
+}) {
+  return (
+    <div className="history-compare">
+      <div className="history-compare-copy">
+        <h2>Domaine par domaine</h2>
+        <p className="lede">Votre première évaluation en pointillés, la dernière en vert : la surface gagnée montre où vos efforts ont porté.</p>
+        <ul className="compare-legend data">
+          <li><span className="swatch swatch--first" aria-hidden="true" />Première · {formatDate(first.completed_at)}</li>
+          <li><span className="swatch swatch--last" aria-hidden="true" />Dernière · {formatDate(last.completed_at)}</li>
+        </ul>
+      </div>
+      <PentaRadar
+        scores={last.domains.map((d) => d.score)}
+        compareScores={first.domains.map((d) => d.score)}
+        isAnimated
+        labels={last.domains.map((d, i) => ({
+          name: domainShort[d.id] ?? d.name,
+          value: formatDelta(d.score, first.domains[i]?.score),
+          tone: levelTone(d.level),
+        }))}
+        title={`Comparaison par domaine : ${last.domains
+          .map((d, i) => `${d.name} ${formatScore(first.domains[i]?.score ?? 0)} puis ${formatScore(d.score)}`)
+          .join(', ')}`}
+      />
+    </div>
+  );
+}
+
 export function HistoryScreen(props: HistoryScreenProps) {
-  const { account, canGoBackToResults, onBack, onStart, onLoggedOut, onSessionExpired } = props;
+  const { account, canGoBackToResults, domainShort = {}, onBack, onStart, onLoggedOut, onSessionExpired } = props;
   const [load, setLoad] = useState<Load>({ kind: 'loading' });
   const [isConfirmingDelete, setConfirmingDelete] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -83,19 +133,18 @@ export function HistoryScreen(props: HistoryScreenProps) {
       {chronological.length > 0 && (
         <>
           <HistoryChart entries={chronological} />
+          {chronological.length > 1 && <HistoryCompare first={first} last={last} domainShort={domainShort} />}
           <ol className="history-rows">
             {load.kind === 'ready' &&
               load.entries.map((entry, i) => (
-                <li key={entry.id} className="history-row">
+                <li key={entry.id} className="history-row reveal" style={{ '--i': i + 4 } as CSSProperties}>
                   <span>{formatDate(entry.completed_at)}</span>
                   <span className="history-note">{i === 0 ? 'Dernière évaluation' : 'Évaluation archivée'}</span>
                   <span className="data history-score">{formatScore(entry.global_score)}</span>
                   <span className="history-level" style={{ color: levelTone(entry.maturity_level) }}>
                     {entry.maturity_level}
                   </span>
-                  <span className="data history-delta">
-                    {formatDelta(entry.global_score, load.entries[i + 1]?.global_score)}
-                  </span>
+                  <DeltaMark current={entry.global_score} previous={load.entries[i + 1]?.global_score} />
                 </li>
               ))}
           </ol>

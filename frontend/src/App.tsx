@@ -195,6 +195,7 @@ export default function App() {
           <HistoryScreen
             account={account}
             canGoBackToResults={isAssessmentComplete}
+            domainShort={domainShort}
             onBack={() => navigate('results')}
             onStart={openStart}
             onLoggedOut={handleLoggedOut}

@@ -109,7 +109,7 @@ p {
   padding: 16px 32px;
   font-size: 16px;
   font-weight: 500;
-  transition: background var(--duration-fast) ease;
+  transition: background var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -127,7 +127,12 @@ p {
   padding: 15px 28px;
   font-size: 15px;
   font-weight: 500;
-  transition: border-color var(--duration-fast) ease;
+  transition: border-color var(--duration-fast) ease, background var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(16, 32, 47, 0.03);
 }
 
 .btn-outline:hover {
@@ -166,6 +171,72 @@ p {
   white-space: nowrap;
 }
 
+/* Appui tactile : léger enfoncement (principe 9 de docs/design/RESEARCH.md). */
+.btn-primary:active:not(:disabled),
+.btn-outline:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Boutons avec icône (lucide-react) : icône alignée, trait fin. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-icon svg {
+  flex: none;
+}
+
+.icon-spin {
+  animation: icon-spin 900ms linear infinite;
+}
+
+@keyframes icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Apparition en cascade : ajouter .reveal et --i (rang) sur l'élément. */
+.reveal {
+  animation: reveal-rise var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes reveal-seal {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-6deg);
+  }
+}
+
+/* Trame de relevé technique, estompée vers les bords. */
+.surface-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.surface-grid::before {
+  content: '';
+  position: absolute;
+  inset: -24px calc(-1 * var(--page-gutter));
+  z-index: -1;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 30%, transparent 78%);
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -175,5 +246,28 @@ p {
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
   }
+}
+
+/* Apparition liée au défilement (CSS natif, sans JS). Navigateurs sans support : contenu affiché tel quel. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-scroll {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+/* Flèche qui avance au survol : indique la direction de l'action. */
+.btn-arrow svg {
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.btn-arrow:hover:not(:disabled) svg {
+  transform: translateX(4px);
 }

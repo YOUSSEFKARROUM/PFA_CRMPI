@@ -9,8 +9,16 @@ interface HistoryChartProps {
 const WIDTH = 900;
 const HEIGHT = 230;
 const LEFT = 60;
-const RIGHT = 40;
+/** Marge droite : laisse la place aux noms des zones de niveau. */
+const RIGHT = 96;
 const GRID = [0, 50, 100];
+/** Zones de niveau (seuils de src/scoring.py, affichés seulement). */
+const BANDS = [
+  { from: 0, to: 25, label: 'Critique', className: 'band--critical' },
+  { from: 25, to: 50, label: 'Faible', className: 'band--weak' },
+  { from: 50, to: 75, label: 'Moyen', className: 'band--medium' },
+  { from: 75, to: 100, label: 'Avancé', className: 'band--advanced' },
+];
 
 const yFor = (score: number) => 180 - (score / 100) * 145;
 
@@ -26,14 +34,41 @@ export function HistoryChart({ entries }: HistoryChartProps) {
   return (
     <figure className="history-chart" aria-label={`Évolution du score global : ${entries.map((e) => formatScore(e.global_score)).join(', ')}`}>
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-hidden="true">
+        {BANDS.map((band) => (
+          <g key={band.label} className={`band ${band.className}`}>
+            <rect x={34} y={yFor(band.to)} width={WIDTH - 34} height={yFor(band.from) - yFor(band.to)} />
+            <text x={WIDTH - 6} y={yFor(band.to) + 13} textAnchor="end">{band.label}</text>
+          </g>
+        ))}
+        {points.length > 1 && (
+          <polygon
+            className="chart-area"
+            points={[
+              `${points[0].x.toFixed(1)},${yFor(0)}`,
+              ...points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`),
+              `${points[points.length - 1].x.toFixed(1)},${yFor(0)}`,
+            ].join(' ')}
+          />
+        )}
         {GRID.map((value) => (
           <line key={value} x1={34} y1={yFor(value)} x2={WIDTH} y2={yFor(value)} className="chart-grid" />
         ))}
         {points.length > 1 && (
-          <polyline points={points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')} className="chart-line" />
+          <polyline
+            points={points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}
+            pathLength={1}
+            className="chart-line"
+          />
         )}
-        {points.map((p) => (
-          <circle key={p.entry.id} cx={p.x} cy={p.y} r="4.5" className="chart-dot" />
+        {points.map((p, i) => (
+          <circle
+            key={p.entry.id}
+            cx={p.x}
+            cy={p.y}
+            r="5"
+            className="chart-dot"
+            style={{ animationDelay: `${300 + i * 120}ms` }}
+          />
         ))}
       </svg>
       {GRID.map((value) => (

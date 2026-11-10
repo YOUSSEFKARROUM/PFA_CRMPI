@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
+import { BadgeCheck, Check, FileDown, LoaderCircle, ShieldAlert, ShieldCheck } from 'lucide-react';
 import type { Account, Evaluation } from '../../api/types';
 import { useProgress } from '../../hooks/useProgress';
 import {
-  LEVEL_HEADLINE, LEVEL_SUMMARY, SEVERITY_LABEL, SEVERITY_TONE, formatMonthYear, formatScore, levelTone,
+  LEVEL_HEADLINE, LEVEL_RANGE, LEVEL_SUMMARY, SEVERITY_LABEL, SEVERITY_TONE, formatMonthYear, formatScore, levelTone,
 } from '../../lib/maturity';
 import { priorityReason, sourcesOf } from '../../lib/recommendations';
+import { DomainIcon, ICON_STROKE } from '../common/DomainIcon';
 import { PentaRadar } from '../common/PentaRadar';
 import { ConsistencyChecks } from './ConsistencyChecks';
 import { ScoreDrivers } from './ScoreDrivers';
@@ -33,6 +35,17 @@ interface ResultsScreenProps {
 
 const errorMessage = (e: unknown) => (e instanceof Error ? e.message : 'Une erreur est survenue.');
 
+/** Rang dans la cascade d'apparition (variable CSS --i). */
+const order = (i: number) => ({ '--i': i }) as CSSProperties;
+
+/** Icône d'état d'un bouton de téléchargement : repos, génération, terminé. */
+function StatusIcon({ status, idle }: { status: Status; idle: typeof FileDown }) {
+  if (status.kind === 'busy') return <LoaderCircle size={18} strokeWidth={ICON_STROKE} className="icon-spin" aria-hidden="true" />;
+  if (status.kind === 'done') return <Check size={18} strokeWidth={2} className="icon-done" aria-hidden="true" />;
+  const Icon = idle;
+  return <Icon size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />;
+}
+
 export function ResultsScreen(props: ResultsScreenProps) {
   const { organization, sector, isDemo, evaluation, account, domainShort, isSaved } = props;
   const progress = useProgress(`${evaluation.global_score}-${organization}`);
@@ -42,6 +55,8 @@ export function ResultsScreen(props: ResultsScreenProps) {
   const [badgeStatus, setBadgeStatus] = useState<Status>({ kind: 'idle' });
 
   const tone = levelTone(evaluation.maturity_level);
+  const isWeak = evaluation.maturity_level === 'Critique' || evaluation.maturity_level === 'Faible';
+  const LevelIcon = isWeak ? ShieldAlert : ShieldCheck;
   const saveLabel = !account
     ? 'Créer un compte pour suivre mon évolution'
     : isSaved ? 'Enregistrée dans votre historique' : 'Enregistrer dans mon historique';
@@ -90,19 +105,27 @@ export function ResultsScreen(props: ResultsScreenProps) {
 
   return (
     <section className="page results" aria-labelledby="results-title">
-      <div className="results-hero">
+      <div className="results-hero surface-grid">
+        <div className="results-bar data" aria-hidden="true">
+          <span>Pentascore · relevé de maturité</span>
+          <span>Échelle 0–100</span>
+        </div>
         <div className="results-score">
-          <span className="label">{header.join(' · ')}</span>
-          {isDemo && <span className="demo-flag">Profil fictif de démonstration</span>}
+          <span className="label reveal">{header.join(' · ')}</span>
+          {isDemo && <span className="demo-flag reveal">Profil fictif de démonstration</span>}
           <div className="score-line" aria-label={`Score global : ${formatScore(evaluation.global_score)} sur 100`}>
             <span className="score-value">{formatScore(evaluation.global_score * progress)}</span>
             <span className="score-max">/100</span>
           </div>
-          <h1 id="results-title" style={{ color: tone }}>
+          <span className="level-seal data" style={{ color: tone, borderColor: tone }}>
+            <LevelIcon size={16} strokeWidth={ICON_STROKE} aria-hidden="true" />
+            Niveau {evaluation.maturity_level.toLowerCase()} · {LEVEL_RANGE[evaluation.maturity_level]}
+          </span>
+          <h1 id="results-title" className="reveal" style={{ color: tone, ...order(5) }}>
             {LEVEL_HEADLINE[evaluation.maturity_level]}
           </h1>
-          <p className="results-summary">{LEVEL_SUMMARY[evaluation.maturity_level]}</p>
-          <p className="disclaimer">
+          <p className="results-summary reveal" style={order(6)}>{LEVEL_SUMMARY[evaluation.maturity_level]}</p>
+          <p className="disclaimer reveal" style={order(7)}>
             Auto-évaluation déclarative : ce score reflète vos réponses. C’est un premier repère, qui ne remplace pas
             un audit réalisé par un expert.
           </p>
@@ -110,6 +133,8 @@ export function ResultsScreen(props: ResultsScreenProps) {
         <PentaRadar
           scores={evaluation.domains.map((d) => d.score)}
           progress={progress}
+          isAnimated
+          hasTicks
           labels={evaluation.domains.map((d) => ({
             name: domainShort[d.id] ?? d.name,
             value: formatScore(d.score),
@@ -124,9 +149,13 @@ export function ResultsScreen(props: ResultsScreenProps) {
           <h2>Détail par domaine</h2>
           <span className="data">score · niveau</span>
         </div>
-        {evaluation.domains.map((domain) => (
-          <div key={domain.id} className="domain-row">
-            <span>{domain.name}</span>
+        {evaluation.domains.map((domain, i) => (
+          <div key={domain.id} className="domain-row reveal" style={order(i + 8)}>
+            <span className="domain-cell">
+              <span className="data domain-index">{String(i + 1).padStart(2, '0')}</span>
+              <DomainIcon domainId={domain.id} className="domain-icon" />
+              {domain.name}
+            </span>
             <div className="bar" aria-hidden="true">
               <div className="bar-fill" style={{ transform: `scaleX(${(domain.score / 100) * progress})`, background: levelTone(domain.level) }} />
             </div>
@@ -153,7 +182,7 @@ export function ResultsScreen(props: ResultsScreenProps) {
         <ol className="priority-list">
           {evaluation.recommendations.map((rec, i) => (
             <li key={rec.id} className="priority">
-              <span className="data priority-rank">{String(i + 1).padStart(2, '0')}</span>
+              <span className="priority-rank" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <div className="priority-body">
                 <p className="priority-title">{rec.text}</p>
                 <p className="priority-why">{priorityReason(rec)}</p>
@@ -191,10 +220,12 @@ export function ResultsScreen(props: ResultsScreenProps) {
       )}
 
       <div className="results-actions">
-        <button type="button" className="btn-primary" onClick={handleExport} disabled={exportStatus.kind === 'busy'}>
+        <button type="button" className="btn-primary btn-icon" onClick={handleExport} disabled={exportStatus.kind === 'busy'}>
+          <StatusIcon status={exportStatus} idle={FileDown} />
           {exportStatus.kind === 'busy' ? 'Génération du PDF…' : 'Télécharger le rapport PDF'}
         </button>
-        <button type="button" className="btn-outline" onClick={handleBadge} disabled={badgeStatus.kind === 'busy'}>
+        <button type="button" className="btn-outline btn-icon" onClick={handleBadge} disabled={badgeStatus.kind === 'busy'}>
+          <StatusIcon status={badgeStatus} idle={BadgeCheck} />
           {badgeStatus.kind === 'busy' ? 'Génération du badge…' : 'Télécharger le badge (PNG)'}
         </button>
         {!isDemo && (

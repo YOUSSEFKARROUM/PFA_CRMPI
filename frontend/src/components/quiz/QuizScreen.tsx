@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
+import { ArrowRight } from 'lucide-react';
 import type { Questionnaire } from '../../api/types';
+import { ICON_STROKE } from '../common/DomainIcon';
 import {
   answeredCount, currentDomainIndex, isDomainComplete, isStepComplete, stepCount, visibleQuestions,
   type AssessmentState,
 } from '../../state/assessment';
 import { PentaProgress } from './PentaProgress';
 import { QuestionBlock } from './QuestionBlock';
+import { useAnswerShortcuts } from './useAnswerShortcuts';
 import './quiz.css';
 
 interface QuizScreenProps {
@@ -25,6 +28,17 @@ export function QuizScreen({ state, questionnaire, onAnswer, onNext, onBack }: Q
   const isLast = state.step === total - 1;
   const questionTotal = questionnaire.domains.reduce((n, d) => n + d.questions.length, 0);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const single = state.mode === 'question' && questions.length === 1 ? questions[0] : null;
+  useAnswerShortcuts({
+    isEnabled: single !== null,
+    optionCount: single?.options.length ?? 0,
+    onAnswer: (value) => single && onAnswer(single.id, value),
+    onNext: () => canContinue && onNext(),
+  });
+  const domainFractions = questionnaire.domains.map(
+    (d) => d.questions.filter((q) => state.answers[q.id] !== undefined).length / Math.max(1, d.questions.length),
+  );
 
   // À chaque étape, le focus revient sur le titre : un lecteur d'écran annonce le nouvel écran.
   useEffect(() => {
@@ -46,13 +60,14 @@ export function QuizScreen({ state, questionnaire, onAnswer, onNext, onBack }: Q
           domainNames={questionnaire.domains.map((d) => d.name)}
           currentIndex={domainIndex}
           completed={questionnaire.domains.map((_, i) => isDomainComplete(state, questionnaire, i))}
+          fractions={domainFractions}
         />
         <div className="quiz-answered data">
           {answeredCount(state)}/{questionTotal} réponses
         </div>
       </aside>
 
-      <div className="quiz-main">
+      <div className="quiz-main" key={`${state.mode}-${state.step}`}>
         <header className="quiz-head">
           <span className="quiz-counter data">{counter}</span>
           <h2 id="quiz-title" ref={titleRef} tabIndex={-1}>
@@ -62,8 +77,9 @@ export function QuizScreen({ state, questionnaire, onAnswer, onNext, onBack }: Q
         </header>
 
         <div className="question-list">
-          {questions.map((question) => (
+          {questions.map((question, i) => (
             <QuestionBlock
+              index={i}
               key={question.id}
               question={question}
               value={state.answers[question.id]}
@@ -74,14 +90,21 @@ export function QuizScreen({ state, questionnaire, onAnswer, onNext, onBack }: Q
         </div>
 
         <div className="quiz-actions">
-          <button type="button" className="btn-primary" disabled={!canContinue} onClick={onNext}>
+          <button type="button" className="btn-primary btn-icon btn-arrow" disabled={!canContinue} onClick={onNext}>
             {nextLabel}
+            <ArrowRight size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
           </button>
           <button type="button" className="btn-link" onClick={onBack}>
             {state.step === 0 ? 'Revenir à la préparation' : 'Précédent'}
           </button>
         </div>
         {!canContinue && <p className="quiz-hint">{missingHint}</p>}
+        {single && (
+          <p className="quiz-shortcuts data" aria-hidden="true">
+            Raccourcis : <kbd>1</kbd>–<kbd>{single.options.length}</kbd> pour répondre, <kbd>Entrée</kbd> pour
+            continuer
+          </p>
+        )}
       </div>
     </section>
   );

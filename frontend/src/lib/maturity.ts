@@ -29,6 +29,14 @@ export const LEVEL_HEADLINE: Record<MaturityLevel, string> = {
   Avancé: 'Maturité avancée',
 };
 
+/** Plage de score de chaque niveau (seuils de src/scoring.py, affichés seulement). */
+export const LEVEL_RANGE: Record<MaturityLevel, string> = {
+  Critique: '0–24',
+  Faible: '25–49',
+  Moyen: '50–74',
+  Avancé: '75–100',
+};
+
 export const SEVERITY_LABEL: Record<Severity, string> = {
   Critical: 'Critique',
   High: 'Haute',

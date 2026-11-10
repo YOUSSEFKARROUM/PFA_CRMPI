@@ -27,6 +27,19 @@
   stroke-width: 1;
 }
 
+.progress-outline--inner {
+  stroke-dasharray: 2 3;
+}
+
+/* Le pentagone se remplit domaine par domaine, au rythme des réponses. */
+.progress-fill {
+  fill: var(--color-emerald);
+  fill-opacity: 0.16;
+  stroke: var(--color-emerald);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
 .progress-path {
   fill: none;
   stroke: var(--color-emerald);
@@ -37,7 +50,7 @@
   fill: var(--color-paper);
   stroke: var(--color-ink-28);
   stroke-width: 2;
-  transition: r var(--duration-fast) ease;
+  transition: r var(--duration-base) var(--ease-spring), fill var(--duration-base) ease;
 }
 
 .progress-dot.is-current {
@@ -64,9 +77,14 @@
   color: var(--color-ink-42);
 }
 
+.progress-labels li {
+  transition: color var(--duration-base) ease, transform var(--duration-base) var(--ease-out);
+}
+
 .progress-labels li[aria-current='step'] {
   color: var(--color-ink);
   font-weight: 500;
+  transform: translateX(4px);
 }
 
 .quiz-answered {
@@ -81,6 +99,18 @@
   display: flex;
   flex-direction: column;
   gap: 34px;
+}
+
+/* Changement d'étape : le contenu glisse doucement (la clé React relance l'animation). */
+.quiz-head {
+  animation: quiz-enter var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes quiz-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
 }
 
 .quiz-head {
@@ -151,6 +181,9 @@
 
 .guidance-toggle {
   align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: none;
   padding: 0;
@@ -183,15 +216,59 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: transparent;
+  gap: 8px;
+  background: var(--color-paper);
   color: var(--color-ink);
   border: 1px solid var(--color-rule-strong);
-  transition: border-color var(--duration-fast) ease, background var(--duration-fast) ease;
+  transition: border-color var(--duration-fast) ease, background var(--duration-fast) ease,
+    color var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
 }
 
 .choice:hover {
   border-color: var(--color-emerald);
+  transform: translateY(-2px);
+}
+
+.choice:active {
+  transform: scale(0.97);
+}
+
+.choice.is-selected {
+  animation: choice-pick var(--duration-slow) var(--ease-spring);
+}
+
+@keyframes choice-pick {
+  from {
+    transform: scale(0.94);
+  }
+}
+
+.choice-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Échelle graduée : chaque réponse montre sa place sur l'échelle de maturité 1-5. */
+.choice-scale {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.choice-scale i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  opacity: 0.35;
+}
+
+.choice-scale i.is-on {
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.choice-check {
+  margin-left: auto;
 }
 
 .choice:focus-within {
@@ -220,6 +297,21 @@
   display: flex;
   align-items: center;
   gap: 24px;
+}
+
+.quiz-shortcuts {
+  font-size: 11.5px;
+  color: var(--color-ink-42);
+}
+
+.quiz-shortcuts kbd {
+  font-family: var(--font-data);
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid var(--color-rule-strong);
+  border-bottom-width: 2px;
+  background: var(--color-paper);
+  color: var(--color-ink-70);
 }
 
 .quiz-hint {
@@ -257,7 +349,20 @@
 
   .choice {
     flex-direction: row;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
+  }
+
+  .choice-top {
+    flex: none;
+    width: 76px;
+  }
+
+  .choice-check {
+    display: none;
+  }
+
+  .quiz-shortcuts {
+    display: none;
   }
 }

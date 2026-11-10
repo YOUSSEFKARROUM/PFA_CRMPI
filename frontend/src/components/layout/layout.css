@@ -37,6 +37,12 @@
   letter-spacing: -0.01em;
 }
 
+.penta-logo polygon:last-child {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: reveal-seal var(--duration-slow) var(--ease-spring) 200ms both;
+}
+
 .wordmark-accent {
   color: var(--color-emerald);
 }
@@ -48,12 +54,32 @@
 }
 
 .site-nav a {
+  position: relative;
   font-size: 14px;
   color: var(--color-ink-62);
+  transition: color var(--duration-fast) ease;
+}
+
+/* Soulignement qui se déploie depuis la gauche au survol. */
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--color-emerald);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out);
 }
 
 .site-nav a:hover {
   color: var(--color-ink);
+}
+
+.site-nav a:hover::after {
+  transform: scaleX(1);
 }
 
 .step-label {
@@ -86,7 +112,11 @@
   padding: 9px 20px;
   font-size: 13.5px;
   font-weight: 500;
-  transition: background var(--duration-fast) ease;
+  transition: background var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
+}
+
+.nav-cta:active {
+  transform: scale(0.97);
 }
 
 .nav-cta:hover {
