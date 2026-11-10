@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pentascore — Soutenance PFA</title>
+<style>
+/*FONTFACES*/
+/*CSS*/
+</style>
+</head>
+<body>
+<main class="stage" id="stage">
+
+<!-- Couverture -->
+<section class="slide" id="s-cover" data-chapter="-1" data-budget="15">
+  <div class="logos rv"><img src="{{asset:logo_ensa.png}}" alt="ENSA Béni Mellal"><i></i><img src="{{asset:logo_cmrpi.png}}" alt="CMRPI"></div>
+  <div class="eyebrow rv" style="--d:.1s">Université Sultan Moulay Slimane · ENSA Béni Mellal · Soutenance PFA</div>
+  <h1 class="cover-h rv" style="--d:.15s">Concevoir une plateforme d'auto-évaluation de la <em>maturité cybersécurité</em> pour les PME marocaines</h1>
+  <div class="people rv" style="--d:.35s">
+    <div><span>Soutenu par</span><b>Youssef Ait Karroum</b><i>Cycle ingénieur IACS</i></div>
+    <div><span>Membres du jury</span><b>Pr. Mohamed Gouskir</b><b>Pr. Wissal Fartit</b><i>ENSA Béni Mellal</i></div>
+    <div><span>Encadré par</span><b>Dr. Rachid Abouettahir</b><i>CMRPI · Espace Maroc Cyberconfiance</i></div>
+  </div>
+  <div class="cover-year rv" style="--d:.5s">Année universitaire 2025–2026</div>
+  <svg class="cover-pent" id="coverPent" viewBox="0 0 540 560" aria-hidden="true"></svg>
+  <div class="cover-read rv" style="--d:1.6s"><span id="coverOrg">Profil de test · PME Finance</span><b id="coverScore">44</b><em id="coverLevel">Faible</em></div>
+</section>
+
+<!-- Sommaire -->
+<section class="slide" id="s-sommaire" data-chapter="-1" data-budget="15">
+  <div class="eyebrow rv">Plan de la soutenance</div>
+  <h2 class="t rv" style="--d:.1s">Cinq parties, <em>comme les cinq sommets</em> du pentagone.</h2>
+  <ol class="toc">
+    <li class="rv" style="--d:.2s"><span class="no">01</span><b>Contexte</b><i>Pourquoi un outil pour les PME ?</i></li>
+    <li class="rv" style="--d:.28s"><span class="no">02</span><b>Méthode</b><i>Comment mesurer la maturité ?</i></li>
+    <li class="rv" style="--d:.36s"><span class="no">03</span><b>Réalisation</b><i>Comment l'application est-elle construite ?</i></li>
+    <li class="rv" style="--d:.44s"><span class="no">04</span><b>Le produit</b><i>Que voit le dirigeant de PME ?</i></li>
+    <li class="rv" style="--d:.52s"><span class="no">05</span><b>Recul et conclusion</b><i>Quelles limites, quelles suites ?</i></li>
+  </ol>
+  <svg class="toc-pent" id="tocPent" viewBox="0 0 400 400" aria-hidden="true"></svg>
+</section>
+
+<!-- Organisme d'accueil -->
+<section class="slide" id="s-cmrpi" data-chapter="0" data-budget="40">
+  <div class="eyebrow rv">L'organisme d'accueil</div>
+  <div class="org-card rv" style="--d:.15s">
+    <img src="{{asset:logo_cmrpi.png}}" alt="Logo du CMRPI">
+    <b>Centre Marocain de Recherches Polytechniques et d'Innovation</b>
+    <span>Association savante à but non lucratif, fondée en juin 2012 à l'initiative du Pr. Youssef Bentaleb.</span>
+  </div>
+  <div class="org-r">
+    <div class="lab rv" style="--d:.25s">Ce que fait le CMRPI</div>
+    <div class="mis rv" style="--d:.3s"><span class="no">01</span><div><b>Recherche et transfert du savoir</b><i>vers le milieu socio-économique national et international</i></div></div>
+    <div class="mis rv" style="--d:.4s"><span class="no">02</span><div><b>Espace Maroc Cyberconfiance</b><i>signalements de cyberviolence via l'EMC-Helpline : 1 227 en 2023</i></div></div>
+    <div class="mis rv" style="--d:.5s"><span class="no">03</span><div><b>Guide CMRPI/AUSIM</b><i>bonnes pratiques de cybersécurité pour les PME</i></div></div>
+  </div>
+</section>
+
+<!-- 1 · Constat -->
+<section class="slide" id="s-constat" data-chapter="0" data-budget="30">
+  <div class="eyebrow rv">Le constat · Maroc, 2025</div>
+  <div class="big rv" style="--d:.1s"><span class="count" data-to="879">0</span></div>
+  <p class="big-sub rv" style="--d:.3s">incidents de cybersécurité traités par la DGSSI en 2025, dont <b>109</b> avec intervention directe du maCERT.</p>
+  <div class="delta rv" style="--d:.5s">2024 <b>644</b> → 2025 <b>879</b> <i>+36 %</i></div>
+  <div class="matrix rv" style="--d:.2s">
+    <div class="lab">1 point = 1 incident traité</div>
+    <svg id="dotMatrix" width="580" height="330" viewBox="0 0 580 330" aria-hidden="true"></svg>
+    <div class="legend">
+      <span><i style="background:var(--coral)"></i>109 interventions du maCERT</span>
+      <span><i style="background:#cfc9b8"></i>770 autres incidents</span>
+    </div>
+    <p class="src" style="margin-top:18px">Source : déclaration du ministre délégué chargé de l'Administration de la Défense nationale devant le Parlement, nov. 2025 (reprise par la presse).</p>
+  </div>
+</section>
+
+<!-- 2 · Problème -->
+<section class="slide" id="s-probleme" data-chapter="0" data-budget="50" data-steps="1">
+  <div class="eyebrow rv">Le problème</div>
+  <h2 class="t rv" style="--d:.1s">Un pays bien classé, des PME <em>sans boussole</em>.</h2>
+  <div class="cols3">
+    <div class="rv" style="--d:.25s"><div class="bignum" style="color:var(--em)">Tier 1</div>
+      <p class="cap">Global Cybersecurity Index de l'UIT.</p><p class="src">UIT · GCI 2024</p></div>
+    <div class="rv" style="--d:.4s"><div class="bignum">≈ 40<small>pages</small></div>
+      <p class="cap">Le guide CMRPI/AUSIM : un document, pas un outil.</p><p class="src">Guide CMRPI/AUSIM</p></div>
+    <div class="rv" style="--d:.55s"><div class="bignum" style="color:var(--coral)">0<small>outil</small></div>
+      <p class="cap">Aucun auto-diagnostic simple pour une PME.</p><p class="src">Constat du stage</p></div>
+  </div>
+  <div class="hub">
+    <svg class="hub-lines st1" viewBox="0 0 1360 560" aria-hidden="true"><path d="M680 220L320 70M680 220L1040 70M680 220L320 330M680 220L1040 330M680 220V440" fill="none" stroke="#10202F" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="4 6"/></svg>
+    <div class="hub-q st1"><b>Problématique</b><q>Comment permettre à une PME marocaine d'auto-évaluer sa maturité cybersécurité à partir du guide CMRPI/AUSIM, et d'obtenir des recommandations priorisées ?</q><i>Périmètre : auto-évaluation déclarative · ni audit, ni surveillance du réseau</i></div>
+    <div class="dfi d1 st1" style="transition-delay:0.25s"><span>01</span><b>Réponses déclaratives</b><i>repérer les contradictions</i></div>
+    <div class="dfi d2 st1" style="transition-delay:0.35s"><span>02</span><b>Un score lisible</b><i>un calcul vérifiable à la main</i></div>
+    <div class="dfi d3 st1" style="transition-delay:0.45s"><span>03</span><b>Des priorités utiles</b><i>savoir par où commencer</i></div>
+    <div class="dfi d4 st1" style="transition-delay:0.55s"><span>04</span><b>Confidentialité</b><i>aucune donnée vers un tiers</i></div>
+    <div class="dfi d5 st1" style="transition-delay:0.65s"><span>05</span><b>Simplicité</b><i>pour un dirigeant non technique</i></div>
+  </div>
+</section>
+
+<!-- 4 · Méthode -->
+<section class="slide" id="s-methode" data-chapter="1" data-budget="55" data-steps="2">
+  <div class="eyebrow abs-eyebrow rv">La méthode · référentiel d'évaluation</div>
+  <svg class="pent-wrap" id="domPent" viewBox="0 0 780 620" aria-hidden="true"></svg>
+  <div class="refs">
+    <h3 class="refs-h rv" style="--d:.2s">Cinq domaines, quatre sources, <em>un score</em>.</h3>
+    <div class="st1" style="--d:0s"><div class="row"><span class="k">SOURCE</span><span class="v">Guide CMRPI/AUSIM<small>référentiel métier, bonnes pratiques PME</small></span></div></div>
+    <div class="st1" style="--d:.08s"><div class="row"><span class="k">NORME</span><span class="v">ISO/IEC 27001:2022<small>4 thèmes de l'Annexe A (A.5 à A.8)</small></span></div></div>
+    <div class="st1" style="--d:.16s"><div class="row"><span class="k">FRAMEWORK</span><span class="v">NIST CSF 2.0<small>6 fonctions, dont Govern (ajout 2024)</small></span></div></div>
+    <div class="st1" style="--d:.24s"><div class="row"><span class="k">LOI</span><span class="v">Loi 09-08<small>consentement explicite dans le parcours</small></span></div></div>
+    <div class="formula st1" style="--d:.34s">Score domaine = ((moyenne Likert − 1) / 4) × 100<small>25 questions · notes de 1 à 5 · global = moyenne des 5 domaines</small></div>
+    <div class="lvbar st1" style="--d:.44s">
+      <div style="background:var(--coral)"><b>Critique</b><i>[0, 25[</i></div>
+      <div style="background:var(--orange)"><b>Faible</b><i>[25, 50[</i></div>
+      <div style="background:var(--olive)"><b>Moyen</b><i>[50, 75[</i></div>
+      <div style="background:var(--em)"><b>Avancé</b><i>[75, 100]</i></div>
+    </div>
+  </div>
+  <div class="nm st2">
+    <svg id="nmLogo" width="72" height="72" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    <div class="t1">Penta<em>score</em></div>
+    <div class="t2">Penta : les 5 domaines<br>Score : votre résultat</div>
+  </div>
+</section>
+
+<!-- Moteur -->
+<section class="slide" id="s-moteur" data-chapter="1" data-budget="55">
+  <div class="eyebrow rv">La méthode à l'épreuve · 3 profils de test</div>
+  <h2 class="t rv" style="--d:.1s">Trois PME fictives, <em>un seul moteur</em> de calcul.</h2>
+  <div class="profs rv" style="--d:.2s" data-ui>
+    <button class="pbtn" data-p="finance"><kbd>1</kbd>PME Finance</button>
+    <button class="pbtn" data-p="commerce"><kbd>2</kbd>PME Commerce</button>
+    <button class="pbtn" data-p="techno"><kbd>3</kbd>PME Technologie</button>
+  </div>
+  <div class="res-l rv" style="--d:.3s">
+    <div class="lab" id="pOrg"></div>
+    <div class="sc"><span id="pScore">0</span><small>/100</small></div>
+    <div class="seal" id="pLevel"></div>
+  </div>
+  <svg class="radar-box rv" style="--d:.3s" id="profRadar" viewBox="0 0 520 420" aria-hidden="true"></svg>
+  <div class="prio rv" style="--d:.5s">
+    <div class="lab">Priorités · domaine le plus faible d'abord</div>
+    <div class="list" id="pRecs"></div>
+  </div>
+</section>
+
+<!-- Réalisation -->
+<section class="slide" id="s-realisation" data-chapter="2" data-budget="50">
+  <div class="eyebrow rv">La réalisation · architecture</div>
+  <h2 class="t rv" style="--d:.1s">Une architecture <em>simple</em>, une qualité stricte.</h2>
+  <div class="arch rv" style="--d:.25s">
+    <div class="abox"><b>Interface React</b><span>aucune installation pour la PME</span></div>
+    <div class="aarrow"><svg width="34" height="12" viewBox="0 0 34 12"><path d="M0 6h31M26 1l6 5-6 5" fill="none" stroke="#10202F" stroke-width="1.5"/></svg></div>
+    <div class="abox"><b>API FastAPI</b><span>recalcule toujours le score côté serveur</span></div>
+    <div class="aarrow"><svg width="34" height="12" viewBox="0 0 34 12"><path d="M0 6h31M26 1l6 5-6 5" fill="none" stroke="#10202F" stroke-width="1.5"/></svg></div>
+    <div class="abox core"><b>Moteur Python</b><span>score · recommandations · cohérence · PDF</span><span class="chip">testable sans interface</span></div>
+    <div class="aarrow"><svg width="34" height="12" viewBox="0 0 34 12"><path d="M0 6h31M26 1l6 5-6 5" fill="none" stroke="#10202F" stroke-width="1.5"/></svg></div>
+    <div class="abox"><b>SQLite</b><span>7 tables, 47 recommandations</span></div>
+  </div>
+  <div class="badges rv" style="--d:.45s">
+    <div class="badge"><div class="n"><span class="count" data-to="285">0</span></div><div class="l">tests serveur</div></div>
+    <div class="badge"><div class="n"><span class="count" data-to="71">0</span></div><div class="l">tests interface</div></div>
+    <div class="badge"><div class="n"><span class="count" data-to="13">0</span></div><div class="l">parcours testés de bout en bout</div></div>
+    <div class="badge"><div class="n"><span class="count" data-to="98">0</span> %</div><div class="l">couverture de code</div></div>
+  </div>
+  <p class="foot-line rv" style="--d:.6s"><b>Hors ligne :</b> aucune requête externe, vérifiée par un test automatique · intégration continue à chaque push.</p>
+</section>
+
+<!-- 9 · Le film -->
+<section class="slide" id="s-film" data-chapter="3" data-budget="135" data-steps="1">
+  <div class="eyebrow rv">Le produit · film de démonstration · 2 min</div>
+  <div class="fr rv" style="--d:.15s" data-ui>
+    <div class="chrome"><i></i><i></i><i></i><span>Pentascore</span><span class="tag">Capture réelle</span></div>
+    <div class="film" id="filmBox">
+      <video id="film" muted playsinline preload="auto"></video>
+      <img class="poster" src="{{asset:poster.jpg}}" width="1280" height="720" alt="Première image du film de démonstration Pentascore">
+      <div class="veil"><div class="play"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M1 1l18 10L1 21z" fill="#0A7D68"/></svg>→ pour lancer le film</div></div>
+    </div>
+    <div class="fbar"><i id="filmBar"></i></div>
+  </div>
+  <aside class="rail rv" style="--d:.3s" data-ui>
+    <div class="lab">Chapitres</div>
+    <div class="tm"><span id="filmTime">00:00</span><small> / 02:05</small></div>
+    <ol id="filmChapters"></ol>
+    <p class="hint">Capture réelle de l'application, rejouée sans connexion.</p>
+  </aside>
+</section>
+
+<!-- Pour agir -->
+<section class="slide" id="s-features" data-chapter="3" data-budget="40">
+  <div class="eyebrow rv">Le produit · pour passer à l'action</div>
+  <h2 class="t rv" style="--d:.1s">Un score ne suffit pas : il faut pouvoir <em>agir</em>.</h2>
+  <figure class="shot after rv" style="--d:.3s"><img src="{{asset:after.jpg}}" width="1100" height="768" alt="Écran de résultats de la version React, score 44 sur 100"></figure>
+  <div class="adds">
+    <div class="add rv" style="--d:.5s"><span class="no">01</span><div><b>Rapport PDF de 3 pages</b><i>plan d'action, référence, QR de réévaluation à 6 mois</i></div></div>
+    <div class="add rv" style="--d:.6s"><span class="no">02</span><div><b>Rejouer le score</b><i>chaque question pèse 4 points</i></div></div>
+    <div class="add rv" style="--d:.7s"><span class="no">03</span><div><b>30 règles de cohérence</b><i>les réponses contradictoires sont signalées</i></div></div>
+    <div class="add rv" style="--d:.8s"><span class="no">04</span><div><b>Badge et historique</b><i>suivre ses progrès d'une évaluation à l'autre</i></div></div>
+  </div>
+</section>
+
+<!-- Limites et perspectives -->
+<section class="slide" id="s-limites" data-chapter="4" data-budget="40">
+  <div class="eyebrow rv">Limites et perspectives</div>
+  <h2 class="t rv" style="--d:.1s">Un premier repère, <em>pas encore une référence</em>.</h2>
+  <div class="lim">
+    <div class="lim-h rv" style="--d:.2s"><span>Limite actuelle</span><span>Perspective</span></div>
+    <div class="lim-r rv" style="--d:0.30s"><div><b>Une évaluation déclarative</b><i>le score reflète les réponses, pas la réalité du terrain</i></div><span class="ar">→</span><div class="to">Demander des preuves (politique, capture) et proposer une évaluation accompagnée par le CMRPI</div></div>
+    <div class="lim-r rv" style="--d:0.42s"><div><b>Validée sur 3 PME fictives</b><i>le moteur calcule juste, la justesse du diagnostic reste à prouver</i></div><span class="ar">→</span><div class="to">Pilote avec de vraies PME via le CMRPI et l'AUSIM, comparé à l'avis d'un auditeur</div></div>
+    <div class="lim-r rv" style="--d:0.54s"><div><b>Des poids égaux, des seuils fixes</b><i>chaque question vaut 4 points ; seuils 25 / 50 / 75</i></div><span class="ar">→</span><div class="to">Pondérer selon la criticité et calibrer les seuils sur les données du pilote</div></div>
+    <div class="lim-r rv" style="--d:0.66s"><div><b>Un référentiel figé, en français</b><i>pas de comparaison entre PME d'un même secteur</i></div><span class="ar">→</span><div class="to">Version arabe, comparaison par secteur, mise à jour suivant le guide, l'ISO et le NIST</div></div>
+  </div>
+</section>
+
+<!-- Conclusion -->
+<section class="slide" id="s-conclusion" data-chapter="4" data-budget="20">
+  <div class="eyebrow rv">Conclusion</div>
+  <h1 class="concl rv" style="--d:.1s">Évaluer. <em>Comprendre.</em> Agir.</h1>
+  <div class="cols3 c3">
+    <div class="rv" style="--d:.3s"><b style="color:var(--em)">Évaluer</b><p class="cap">25 questions, 5 domaines, un score sur 100</p></div>
+    <div class="rv" style="--d:.4s"><b style="color:var(--gold)">Comprendre</b><p class="cap">un niveau, un calcul visible, les points faibles</p></div>
+    <div class="rv" style="--d:.5s"><b style="color:var(--coral)">Agir</b><p class="cap">des priorités, un rapport PDF, une réévaluation</p></div>
+  </div>
+</section>
+
+<!-- Merci -->
+<section class="slide" id="s-merci" data-chapter="4" data-budget="10">
+  <div class="logos rv"><img src="{{asset:logo_ensa.png}}" alt="ENSA Béni Mellal"><i></i><img src="{{asset:logo_cmrpi.png}}" alt="CMRPI"></div>
+  <h1 class="merci-h rv" style="--d:.15s">Merci pour votre <em>attention</em>.</h1>
+  <p class="merci-q rv" style="--d:.5s">Je suis prêt à répondre à vos questions.</p>
+  <div class="merci-n rv" style="--d:.7s">Youssef Ait Karroum · Pentascore</div>
+</section>
+
+<!-- HUD -->
+<div class="hud-ch" id="hudCh"><span id="chLabel"></span><svg id="chPent" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"></svg></div>
+<div class="hud-timer" id="timer" data-ui><span id="tTotal">00:00</span><span class="sl" id="tSlide"></span></div>
+<nav class="navbar" aria-label="Progression"><span class="foot">ENSA Béni Mellal · IACS · PFA 2025–2026</span><div class="prog"><i id="progFill"></i></div><span id="stepDots"></span><span id="cnt"></span></nav>
+<aside id="notes" data-ui><b id="notesHead"></b><div id="notesBody"></div></aside>
+<div id="help">
+  <h3>Raccourcis</h3>
+  <div>
+    <kbd>→</kbd><kbd>Espace</kbd>suivant &nbsp;·&nbsp; <kbd>←</kbd>précédent &nbsp;·&nbsp; <kbd>Début</kbd><kbd>Fin</kbd><br>
+    <kbd>N</kbd>notes de l'orateur &nbsp;·&nbsp; <kbd>T</kbd>chronomètre &nbsp;·&nbsp; <kbd>R</kbd>remise à zéro<br>
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>changer de profil (diapositive « moteur »)<br>
+    <kbd>D</kbd>aller au film, puis revenir &nbsp;·&nbsp; <kbd>P</kbd>lecture / pause<br>
+    <kbd>F</kbd>plein écran &nbsp;·&nbsp; <kbd>H</kbd>cette aide &nbsp;·&nbsp; <kbd>Échap</kbd>fermer
+  </div>
+</div>
+</main>
+
+<script type="application/json" id="notesData">{{notes}}</script>
+<script type="application/octet-stream" id="filmData">{{b64:film.mp4}}</script>
+<script>
+/*JS*/
+</script>
+</body>
+</html>
