@@ -1,0 +1,236 @@
+% ============================================================
+%  CHAPITRE I : Contexte général et problématique
+% ============================================================
+\chapter{Contexte général et problématique}
+\label{chap:contexte}
+
+\section*{Introduction}
+
+Ce chapitre présente le contexte général du stage, l'organisme d'accueil, la problématique identifiée ainsi que le cahier des charges établi. Il constitue le socle sur lequel repose l'ensemble du travail réalisé dans le cadre de ce stage de Projet de Fin d'Année (PFA).
+
+% -------------------------------------------------------
+\section{Présentation de l'organisme d'accueil}
+\label{sec:organisme}
+
+\subsection{Historique et création du CMRPI}
+
+\hspace{1cm}Le \gls{cmrpi} est une association savante marocaine à but non lucratif, fondée en \textbf{juin 2012}~\cite{cmrpirapport2019}. Il a été créé à l'initiative du Pr.~Youssef Bentaleb, enseignant-chercheur en analyse et modélisation mathématiques et informatique à l'Université Ibn Tofail de Kénitra, et ancien cadre supérieur d'un département ministériel. Parmi les membres fondateurs figurent notamment le Pr.~Moulay Taib Belghiti et le Pr.~Khalid Chougdali, tous deux rattachés à l'Université Ibn Tofail de Kénitra.
+
+Le \gls{cmrpi} poursuit plusieurs missions statutaires~\cite{cmrpirapport2019} :
+
+\begin{itemize}
+  \item Rassembler les personnes physiques et morales concernées par les sciences et techniques ;
+  \item Faciliter l'implication des chercheurs marocains, au pays et à l'étranger, dans le développement du Maroc ;
+  \item Contribuer au transfert du savoir vers le milieu socio-économique national et international ;
+  \item Distinguer les meilleurs spécialistes et favoriser les contacts entre chercheurs ;
+  \item Développer une source d'informations spécialisées et d'expertise de haut niveau ;
+  \item Représenter ses membres auprès d'autres sociétés scientifiques marocaines ou étrangères.
+\end{itemize}
+
+Le \gls{cmrpi} se positionne ainsi comme un carrefour entre recherche, développement et innovation, constituant une \enquote{voie distincte de l'industrie et des instances gouvernementales pour la genèse et la diffusion des idées}~\cite{cmrpirapport2019}.
+
+\subsection{Formations cybersécurité du CMRPI}
+
+Depuis 2014, le \gls{cmrpi} a mené la première campagne de sensibilisation et de formation à la lutte contre la cybercriminalité au Maroc, sous l'égide du Ministère de l'Industrie, de l'Investissement, du Commerce et de l'Économie Numérique, à travers l'\gls{ocpi}~\cite{cmrpicatalogue2021}. Deux campagnes nationales ont été dirigées par le Pr.~Youssef Bentaleb, Président du \gls{cmrpi} :
+
+\begin{itemize}
+  \item la \gls{cnlcc}, entre 2014 et 2017 ;
+  \item la \gls{cnmc}, entre 2018 et 2022.
+\end{itemize}
+
+Les ateliers organisés entre 2014 et 2019 ont couvert des thématiques telles que la détection de cybermenaces, la gouvernance des systèmes d'information, les cyberattaques avancées, la gestion d'incidents et de crise, la blockchain et l'\gls{ia} appliquées à la cybersécurité, ainsi que la sécurité du Cloud~\cite{cmrpicatalogue2021}. Ces thématiques sont directement en lien avec les cinq domaines retenus pour le questionnaire d'auto-évaluation développé dans le cadre de ce stage (Gouvernance, Accès, Infrastructure, Incidents, Sensibilisation), ce qui illustre la continuité entre l'expertise historique du \gls{cmrpi} et le projet réalisé.
+
+\subsection{Espace Maroc Cyberconfiance (EMC)}
+
+L'\gls{emc} est une initiative du \gls{cmrpi} lancée en septembre 2020, avec l'appui du Conseil de l'Europe~\cite{emcrapport2021}. Il s'agit d'une plateforme nationale de référence pour la prévention et la protection numérique des enfants, des jeunes et des femmes au Maroc, à travers des actions de sensibilisation et de traitement des signalements de cyberviolence et de cyberharcèlement.
+
+L'équipe \gls{cmrpi}-\gls{emc} en 2021 était composée de Youssef Bentaleb (Président), El Mehdi Erroussafi (cybersécurité), Ahmed Laftimi (projets digitaux), Houda Adli (protection des données), Hind El Makhtoum (sécurité \gls{iot}), Raouya Aknin (sécurité et blockchain), Sara Jeddin (statistiques), Yasmina Al Marouni (analyse des données), Chaimaa Mouad (sécurité biométrique), Safae El Makhtoum et Lamiaa Moujane (développement web), Safaouane Lammari (cybersécurité) et Lucie Allingri Chevallet (protection de l'enfance), avec l'appui de l'experte internationale Janice Richardson (Luxembourg)~\cite{emcrapport2021}.
+
+L'\gls{emc} s'appuie sur le portail trilingue (arabe, français, anglais) \texttt{www.\allowbreak cyberconfiance.\allowbreak ma}, ainsi que sur deux dispositifs opérationnels : EMC-Helpline et EMC-Stopline. Le lancement officiel d'EMC-Helpline a eu lieu le 7~février~2023, sous l'égide du Ministère de la Transition Numérique et de la Réforme de l'Administration, avec des conventions signées avec le Ministère de la Jeunesse, de la Culture et de la Communication et le Ministère de l'Éducation Nationale, ainsi que des partenariats associatifs avec l'Association ATEC et l'Association Ibny pour l'accompagnement juridique et psychologique~\cite{emcrapport2023}. Le dispositif a été étendu en 2024 avec le service \enquote{EMC Helpline for Women}, à l'occasion de sa quatrième édition, avec pour partenaires institutionnels le Conseil de l'Europe, le Ministère de la Transition Numérique, le Ministère de l'Éducation Nationale, le Ministère de la Justice, le Ministère de la Jeunesse, de la Culture et de la Communication, la Présidence du Ministère Public, la Direction Générale de la Sûreté Nationale (DGSN) et la Gendarmerie Royale, ainsi que les partenaires technologiques Meta, TikTok et Kaspersky~\cite{emcrapport2024}.
+
+Le tableau~\ref{tab:emc_stats} présente l'évolution des signalements traités par EMC-Helpline entre 2021 et 2024~\cite{emcstats2024}.
+
+\begin{table}[H]
+  \centering
+  \caption{Évolution des signalements EMC-Helpline (2021--2024)}
+  \label{tab:emc_stats}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{|c|c|l|}
+    \hline
+    \rowcolor{iacsTableHead}
+    \textcolor{white}{\textbf{Année}} &
+    \textcolor{white}{\textbf{Signalements}} &
+    \textcolor{white}{\textbf{Évolution}} \\
+    \hline
+    2021 & 64 (05/07 -- 31/12/2021) & --- \\
+    \hline
+    \rowcolor{iacsLightGray}
+    2022 & 548 (04/01 -- 25/12/2022) & $\times$8,5 \\
+    \hline
+    2023 & 1\,227 (pic --- séisme d'Al Haouz) & $\times$2,2 \\
+    \hline
+    \rowcolor{iacsLightGray}
+    2024 & 574 & repli post-pic \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Le détail par plateforme illustre l'évolution des usages numériques concernés : en 2021, les contenus signalés provenaient majoritairement d'Instagram (84,1\,\%), devant Facebook (14,3\,\%) et WhatsApp (1,6\,\%), la cyberviolence représentant 74,6\,\% des signalements et le discours de haine 9,5\,\%, avec une nette prédominance de la langue française (96,83\,\%) sur l'arabe (3,17\,\%) ; en 2022, Facebook est devenu la première plateforme concernée (70,52\,\%), devant Instagram (20,52\,\%), avec une majorité de signaleurs de sexe masculin (64,68\,\% contre 35,32\,\% de femmes)~\cite{emcstats2024}.
+
+\iacsnote{Ces statistiques d'EMC-Helpline concernent la cyberviolence envers les particuliers (enfants et femmes), un périmètre différent de celui de ce stage, centré sur la maturité cybersécurité des \gls{pme}. Elles sont présentées ici uniquement comme contexte général illustrant l'engagement et la légitimité du \gls{cmrpi} en matière de cybersécurité, et ne constituent pas des données directement liées au projet réalisé.}
+
+\subsection{Structure organisationnelle}
+
+La figure~\ref{fig:organigramme} présente l'organigramme simplifié du \gls{cmrpi}, structuré autour de la présidence et de trois pôles d'activité.
+
+\begin{figure}[H]
+  \centering
+  % --- Organigramme avec TikZ ---
+  \begin{tikzpicture}[
+    node distance=1.5cm,
+    box/.style={
+      rectangle, draw=iacsTeal, fill=iacsLight!40,
+      rounded corners=4pt, minimum width=3.8cm,
+      minimum height=0.9cm, align=center,
+      font=\small\sffamily
+    },
+    arrow/.style={-Stealth, thick, color=iacsTeal}
+  ]
+    \node[box, fill=iacsTeal!20, font=\small\sffamily\bfseries] (dg) {Présidence\\Pr.\ Youssef Bentaleb};
+    \node[box, below left=1.2cm and 1.2cm of dg] (rd) {Pôle R\&D};
+    \node[box, below=1.2cm of dg] (formation) {Pôle Formation\\(CNLCC, CNMC)};
+    \node[box, below right=1.2cm and 1.2cm of dg] (emc) {Espace Maroc\\Cyberconfiance (EMC)};
+
+    \draw[arrow] (dg) -- (rd);
+    \draw[arrow] (dg) -- (formation);
+    \draw[arrow] (dg) -- (emc);
+  \end{tikzpicture}
+  \caption{Organigramme simplifié du \acrshort{cmrpi}}
+  \label{fig:organigramme}
+\end{figure}
+
+% -------------------------------------------------------
+\section{Problématique et objectifs}
+\label{sec:problematique}
+
+\subsection{Problématique}
+
+\hspace{1cm}Les \gls{pme} marocaines ne disposent pas, à ce jour, d'un outil simple et accessible leur permettant d'évaluer leur propre niveau de maturité en matière de cybersécurité. Le \gls{cmrpi} dispose pourtant d'un référentiel de bonnes pratiques élaboré en partenariat avec l'\gls{ausim} (guide \gls{cmrpi}/\gls{ausim}), mais celui-ci reste un document statique d'une quarantaine de pages, non opérationnalisé sous forme d'outil d'auto-diagnostic. Ce constat a motivé la définition de la problématique suivante :
+
+\begin{tcolorbox}[colback=iacsLight!30, colframe=iacsPrimary, boxrule=0.7pt, arc=3pt, title={\textcolor{white}{\faQuestionCircle\; Problématique}}, coltitle=white, fonttitle=\bfseries\sffamily, colbacktitle=iacsPrimary]
+  Comment concevoir une plateforme simple et accessible permettant à une \gls{pme} marocaine d'auto-évaluer sa maturité cybersécurité à partir du guide \gls{cmrpi}/\gls{ausim}, et d'obtenir des recommandations priorisées et actionnables\,?
+\end{tcolorbox}
+
+\iacsnote{Les principaux enjeux identifiés sont l'accessibilité de l'outil pour un public non technique (dirigeants de \gls{pme}), la fiabilité de la méthodologie de scoring, la pertinence des recommandations générées et la simplicité de déploiement de la solution.}
+
+\subsection{Objectifs du projet}
+
+L'objectif principal de ce stage est de développer une plateforme d'auto-évaluation de la maturité cybersécurité pour les \gls{pme} marocaines, basée sur le guide \gls{cmrpi}/\gls{ausim}, intégrant un scoring automatisé et des recommandations personnalisées.
+
+Les objectifs secondaires associés sont :
+
+\begin{itemize}
+  \item Proposer une auto-évaluation accessible sans compétence technique préalable ;
+  \item Garantir un scoring automatisé et reproductible, exprimé sur une échelle de 0 à 100 ;
+  \item Générer des rapports \gls{pdf} personnalisés pour chaque \gls{pme} évaluée ;
+  \item Assurer la conformité à la loi 09-08 relative à la protection des données à caractère personnel ;
+  \item Sensibiliser les \gls{pme} aux enjeux de la cybersécurité.
+\end{itemize}
+
+\subsection{Périmètre du projet}
+
+Le périmètre retenu pour le stage inclut un questionnaire de 25 questions, un moteur de scoring, l'export des résultats au format \gls{pdf} et une interface développée avec le framework Streamlit. Sont en revanche exclus du périmètre du stage, et identifiés comme perspectives futures~: l'authentification multi-tenant en production, le benchmarking inter-\gls{pme}, la certification \enquote{PME Cyber-Sûre} et l'exposition d'une \gls{api} publique.
+
+\subsection{Cahier des charges}
+
+Le tableau~\ref{tab:cahier_charges} résume les spécifications fonctionnelles et non fonctionnelles retenues pour le projet.
+
+\begin{table}[H]
+  \centering
+  \caption{Cahier des charges du projet}
+  \label{tab:cahier_charges}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{|>{\bfseries\color{iacsPrimary}}l|X|}
+    \hline
+    \rowcolor{iacsTeal!15}
+    \textbf{\textcolor{white}{Critère}} & \textbf{\textcolor{white}{Description}} \\
+    \hline
+    Fonctionnalité 1 & Questionnaire d'auto-évaluation de 25 questions réparties sur 5 domaines de cybersécurité \\
+    \hline
+    Fonctionnalité 2 & Moteur de scoring automatisé produisant un score par domaine et un score global (0--100) \\
+    \hline
+    Fonctionnalité 3 & Génération de recommandations personnalisées et priorisées selon les réponses faibles \\
+    \hline
+    Fonctionnalité 4 & Export du rapport de résultats au format \gls{pdf} \\
+    \hline
+    Conformité & Recueil du consentement explicite de l'utilisateur (loi 09-08) \\
+    \hline
+    Accessibilité & Interface utilisable sans compétence technique par un dirigeant de \gls{pme} \\
+    \hline
+    Déploiement & Application mono-bloc déployable simplement, sans infrastructure serveur dédiée \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+% -------------------------------------------------------
+\section{Planification du projet}
+\label{sec:planification}
+
+Le stage s'est déroulé du \textbf{15~juillet} au \textbf{31~août~2026}, soit une durée de sept semaines, organisée en trois jalons validés successivement par l'encadrant professionnel. Le tableau~\ref{tab:planning} détaille ce découpage et son statut de réalisation.
+
+\begin{table}[H]
+  \centering
+  \caption{Planning du stage en trois jalons}
+  \label{tab:planning}
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabularx}{\textwidth}{|c|l|X|c|}
+    \hline
+    \rowcolor{iacsTableHead}
+    \textcolor{white}{\textbf{Jalon}} &
+    \textcolor{white}{\textbf{Période}} &
+    \textcolor{white}{\textbf{Objectif}} &
+    \textcolor{white}{\textbf{Statut}} \\
+    \hline
+    1 & 15--31 juil.\ 2026 & Analyse et conception (questionnaire, méthodologie de scoring) & Validé \\
+    \hline
+    \rowcolor{iacsLightGray}
+    2 & 1--15 août 2026 & Interface Streamlit fonctionnelle et tests & Complété \\
+    \hline
+    3 & 16--31 août 2026 & Export \gls{pdf}, tests de bout en bout, documentation & Complété \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+La figure~\ref{fig:gantt} illustre ce planning sous forme de diagramme de Gantt.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[x=1.9cm, y=0.9cm]
+    % --- Fond alterné ---
+    \fill[iacsLightGray] (0,-0.5) rectangle (6,0.5);
+    \fill[white]          (0,-1.5) rectangle (6,-0.5);
+    \fill[iacsLightGray] (0,-2.5) rectangle (6,-1.5);
+
+    % --- Barres du Gantt (échelle : 1 unité = 1 semaine, du 15 juillet au 31 août) ---
+    \fill[iacsTeal, rounded corners=2pt] (0,0.1) rectangle (2,0.4);
+    \fill[iacsAccent, rounded corners=2pt] (2,-0.9) rectangle (4,-0.6);
+    \fill[iacsOrange, rounded corners=2pt] (4,-1.9) rectangle (6,-1.6);
+
+    % --- Labels ---
+    \node[anchor=east, font=\small\sffamily] at (-0.2, 0) {Jalon 1 -- Analyse \& conception};
+    \node[anchor=east, font=\small\sffamily] at (-0.2,-1) {Jalon 2 -- Interface \& tests};
+    \node[anchor=east, font=\small\sffamily] at (-0.2,-2) {Jalon 3 -- Export PDF \& doc.};
+
+    % --- Axe dates ---
+    \foreach \m/\n in {0/15 juil., 2/1 août, 4/16 août, 6/31 août} {
+      \node[anchor=north, font=\scriptsize\sffamily\color{iacsGray}] at (\m, 0.9) {\n};
+    }
+    \draw[iacsGray, thin] (0,0.7) -- (6,0.7);
+  \end{tikzpicture}
+  \caption{Diagramme de Gantt du stage}
+  \label{fig:gantt}
+\end{figure}
+
+\section*{Conclusion}
+
+Ce chapitre a permis de situer le cadre général du stage, de présenter le \gls{cmrpi} et son initiative EMC, puis de définir la problématique et le cahier des charges du projet. Le chapitre suivant est consacré à l'analyse des référentiels normatifs mobilisés pour construire la méthodologie d'auto-évaluation.

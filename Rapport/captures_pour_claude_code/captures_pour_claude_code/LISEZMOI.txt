@@ -1,0 +1,38 @@
+CAPTURES D'ÉCRAN — GUIDE D'INTÉGRATION POUR CLAUDE CODE
+=========================================================
+
+Contenu de ce dossier :
+- 01_accueil.png              -> Écran d'accueil (sélection du mode + profils démo)
+- 02_questionnaire_section.png -> Écran de questionnaire, mode "section" (Q6-Q7, Accès & Identités)
+- 03_resultats.png             -> Écran de résultats (jauge + radar chart + détail par domaine)
+- 04_pdf_export-1.jpg          -> Page 1 du rapport PDF exporté (score + graphique)
+- 04_pdf_export-2.jpg          -> Page 2 du rapport PDF exporté (recommandations)
+
+MARCHE À SUIVRE :
+1. Copier ce dossier entier dans IACS_Template/figures/screenshots/
+2. Donner ce prompt à Claude Code :
+
+---
+J'ai ajouté 5 captures d'écran dans figures/screenshots/ (01_accueil.png,
+02_questionnaire_section.png, 03_resultats.png, 04_pdf_export-1.jpg,
+04_pdf_export-2.jpg). Utilise-les pour enrichir la section 3.4 (Réalisation) :
+
+- Complète la Figure 3.4 existante (actuellement accueil + résultats) en lui
+  ajoutant 02_questionnaire_section.png comme sous-figure, pour montrer les
+  3 étapes du parcours utilisateur (accueil -> questionnaire -> résultats).
+- Vérifie que la Figure 3.5 (rapport PDF exporté) utilise bien
+  04_pdf_export-1.jpg et 04_pdf_export-2.jpg (remplace les images actuelles
+  si elles diffèrent, ces captures sont plus récentes et cohérentes avec le
+  code corrigé du Jalon 3).
+
+Recompile avec latexmk -pdf -shell-escape main.tex et confirme l'absence
+d'erreurs.
+---
+
+NOTE : ces captures reproduisent fidèlement le CSS réel de l'application
+(src/ui_components.py) via un rendu HTML statique, car je n'ai pas accès à
+un navigateur complet dans mon environnement. Si tu veux des captures 100%
+authentiques (vraie fenêtre de navigateur), tu peux aussi lancer
+`streamlit run app.py` toi-même en local et prendre de vraies captures —
+mais celles-ci sont déjà fidèles au pixel près pour les couleurs, polices
+et mise en page.

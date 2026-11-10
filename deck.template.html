@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pentascore — Soutenance PFA — Youssef Ait Karroum</title>
+<style>
+/*FONTFACES*/
+
+:root{
+  --paper:#FAF8F2; --paper2:#F1EEE3; --ink:#10202F;
+  --soft:rgba(16,32,47,.72); --faint:rgba(16,32,47,.48); --line:rgba(16,32,47,.14);
+  --em:#0A7D68; --em-d:#095C4D; --gold:#A9824C;
+  --coral:#D24A2E; --orange:#D9822B; --olive:#8A8A1F; --dot:#E3DFD2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:var(--paper);overflow:hidden;
+  font-family:'Inter',system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.serif{font-family:'Fraunces',Georgia,serif}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+
+/* ---------- scène fixe 1600x900, mise à l'échelle ---------- */
+.stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;margin-left:-800px;margin-top:-450px;
+  transform:scale(var(--s,1));transform-origin:center center;background:var(--paper);overflow:hidden}
+
+.slide{position:absolute;left:0;top:0;width:1600px;height:900px;padding:84px 120px 0;
+  opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s}
+.slide.active{opacity:1;visibility:visible}
+
+/* ---------- apparitions orchestrées ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+.slide.active .rv{opacity:1;transform:none;transition-delay:var(--d,0s)}
+.st1,.st2{opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,.61,.36,1),transform .6s cubic-bezier(.22,.61,.36,1);transition-delay:var(--d,0s);pointer-events:none}
+.slide.s1 .st1,.slide.s2 .st2{opacity:1;transform:none;pointer-events:auto}
+
+/* ---------- typographie ---------- */
+.eyebrow{font:500 15px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--em);display:flex;align-items:center}
+.eyebrow:before{content:'';width:28px;height:1px;background:var(--em);margin-right:14px}
+h2.t{font:500 54px/1.08 'Fraunces',serif;letter-spacing:-.015em;margin-top:22px;max-width:1100px}
+h2.t em{font-style:normal;color:var(--em)}
+.src{font:500 14px/1.4 'IBM Plex Mono',monospace;color:var(--faint);letter-spacing:.03em}
+.lead{font:400 26px/1.5 'Inter',sans-serif;color:var(--soft)}
+.wm{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.01em}
+.wm em{font-style:normal;color:var(--em)}
+
+/* ---------- HUD ---------- */
+.hud-ch{position:absolute;right:120px;top:44px;display:flex;align-items:center;z-index:20;
+  font:500 13px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);transition:opacity .4s}
+.hud-ch svg{margin-left:14px}
+.hud-timer{position:absolute;left:120px;top:52px;z-index:30;font:500 15px/1 'IBM Plex Mono',monospace;color:var(--ink);
+  background:rgba(250,248,242,.92);border:1px solid var(--line);padding:9px 14px;display:none}
+.hud-timer.on{display:block}
+.hud-timer .sl{margin-left:14px;color:var(--faint)}
+.hud-timer.warn{border-color:var(--orange)} .hud-timer.over{border-color:var(--coral);color:var(--coral)}
+.navbar{position:absolute;left:120px;right:120px;bottom:30px;display:flex;align-items:center;z-index:20;
+  font:500 13px/1 'IBM Plex Mono',monospace;color:var(--faint)}
+.navbar .prog{flex:1;height:1px;background:var(--line);margin:0 22px;position:relative}
+.navbar .prog i{position:absolute;left:0;top:0;height:1px;background:var(--em);transition:width .5s ease}
+.navbar .sd{display:inline-block;width:7px;height:7px;border-radius:50%;border:1px solid var(--faint);margin-left:6px}
+.navbar .sd.on{background:var(--em);border-color:var(--em)}
+#notes{position:absolute;left:0;right:0;bottom:0;z-index:35;background:rgba(16,32,47,.96);color:var(--paper);
+  padding:26px 120px 56px;font:400 21px/1.5 'Inter',sans-serif;display:none;max-height:380px;overflow:hidden}
+#notes.on{display:block}
+#notes b{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#7fd8c4;display:block;margin-bottom:10px;text-transform:uppercase}
+#help{position:absolute;inset:0;z-index:50;background:rgba(250,248,242,.97);display:none;padding:150px 300px}
+#help.on{display:block}
+#help h3{font:500 44px 'Fraunces',serif;margin-bottom:34px}
+#help div{font:400 24px/2 'Inter',sans-serif} #help kbd{font:500 20px 'IBM Plex Mono',monospace;border:1px solid var(--line);padding:3px 10px;margin-right:14px;background:#fff}
+
+/* ---------- 0 : couverture ---------- */
+.cover-h{font:500 66px/1.08 'Fraunces',serif;letter-spacing:-.02em;max-width:900px;margin-top:34px}
+.cover-h em{font-style:normal;color:var(--em)}
+.people{display:flex;margin-top:64px}
+.people>div{margin-right:56px;max-width:300px}
+.people span{display:block;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.people b{display:block;font:500 22px/1.2 'Fraunces',serif}
+.people i{display:block;font:400 15px/1.45 'Inter',sans-serif;color:var(--soft);margin-top:6px;font-style:normal}
+.cover-foot{position:absolute;left:120px;bottom:84px;font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--faint)}
+.cover-pent{position:absolute;left:1000px;top:140px;width:520px;height:560px}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s ease .4s}
+.slide.active .draw{stroke-dashoffset:0}
+.cv{opacity:0;transition:opacity .5s ease}
+.slide.active .cv{opacity:1;transition-delay:calc(1.2s + var(--i)*.35s)}
+
+/* ---------- 1 : 60 % ---------- */
+.big60{font:600 330px/.8 'Fraunces',serif;letter-spacing:-.045em;margin-top:56px}
+.big60 .pc{font-size:150px;color:var(--gold);letter-spacing:0;margin-left:6px}
+.s1-sub{font:400 34px/1.4 'Inter',sans-serif;color:var(--ink);max-width:700px;margin-top:40px}
+.s1-sub b{font-weight:600;color:var(--coral)}
+.matrix{position:absolute;left:1010px;top:170px;width:470px}
+.matrix .lab{font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:18px}
+.dots{display:flex;flex-wrap:wrap;width:470px}
+.dot{width:36px;height:36px;margin:5.5px;border-radius:50%;background:var(--dot);transition:background .45s ease}
+.slide.active .dot.hi{background:var(--coral);transition-delay:calc(var(--i)*24ms + .9s)}
+.legend{display:flex;margin-top:22px;font:400 19px 'Inter',sans-serif;color:var(--soft)}
+.legend span{display:flex;align-items:center;margin-right:30px}
+.legend i{display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:10px}
+
+/* ---------- 2 : paradoxe ---------- */
+.cols3{display:flex;margin-top:60px}
+.cols3>div{flex:1;padding:0 44px;border-left:1px solid var(--line)}
+.cols3>div:first-child{padding-left:0;border-left:none}
+.bignum{font:600 150px/.9 'Fraunces',serif;letter-spacing:-.035em}
+.bignum.sm{font-size:128px}
+.cap{font:400 24px/1.45 'Inter',sans-serif;color:var(--soft);margin-top:24px}
+.punch{position:absolute;left:120px;right:120px;bottom:104px;font:italic 500 44px/1.25 'Fraunces',serif;letter-spacing:-.01em;max-width:1200px}
+.punch em{font-style:normal;color:var(--coral)}
+
+/* ---------- 3 : contexte ---------- */
+.ctx-left{position:absolute;left:120px;top:150px;width:640px}
+.ctx-left p{font:400 24px/1.55 'Inter',sans-serif;color:var(--soft);margin-top:22px}
+.ctx-left p b{color:var(--ink);font-weight:600}
+.chart{position:absolute;left:900px;top:140px;width:580px}
+.chart .lab{font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.bars{display:flex;align-items:flex-end;height:250px;margin-top:24px;border-bottom:1px solid var(--ink)}
+.bcol{width:110px;margin-right:34px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.bcol .v{font:600 22px 'IBM Plex Mono',monospace;margin-bottom:10px;opacity:0;transition:opacity .5s ease 1.6s}
+.slide.active .bcol .v{opacity:1}
+.bar{width:100%;height:0;background:var(--em);transition:height 1.1s cubic-bezier(.22,.61,.36,1) var(--d)}
+.bar.peak{background:var(--coral)}
+.slide.active .bar{height:var(--h)}
+.years{display:flex;margin-top:12px}
+.years span{width:110px;margin-right:34px;text-align:center;font:500 15px 'IBM Plex Mono',monospace;color:var(--faint)}
+.chart .note{font:400 15px/1.45 'Inter',sans-serif;color:var(--faint);margin-top:14px;max-width:560px}
+.quote{position:absolute;left:120px;right:120px;bottom:80px;padding:24px 36px;background:var(--paper2);border-left:4px solid var(--gold)}
+.quote q{display:block;font:italic 500 30px/1.35 'Fraunces',serif;quotes:none}
+.quote .qs{margin-top:14px;font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+
+/* ---------- 4 : méthode ---------- */
+.pent-wrap{position:absolute;left:40px;top:120px;width:780px;height:620px;overflow:visible}
+.pv{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center;transition:opacity .5s ease,transform .6s cubic-bezier(.34,1.56,.64,1)}
+.slide.active .pv{opacity:1;transform:none;transition-delay:calc(1.1s + var(--i)*1.5s)}
+.pl{opacity:0;transition:opacity .6s ease}
+.slide.active .pl{opacity:1;transition-delay:calc(1.3s + var(--i)*1.5s)}
+.inner-shape{opacity:0;transition:opacity .8s ease .2s}
+.slide.s2 .inner-shape{opacity:1}
+.refs{position:absolute;left:870px;top:130px;width:610px}
+.refs-h{font:500 44px/1.1 'Fraunces',serif;letter-spacing:-.015em;margin-bottom:26px}
+.refs-h em{font-style:normal;color:var(--em)}
+.refs .row{display:flex;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.refs .row:first-child{border-top:1px solid var(--line)}
+.refs .k{width:130px;flex-shrink:0;font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--gold)}
+.refs .v{font:400 23px/1.35 'Inter',sans-serif}
+.refs .v small{display:block;font-size:16px;color:var(--faint);margin-top:2px}
+.formula{margin-top:24px;padding:18px 24px;background:var(--paper2);font:500 18px/1.5 'IBM Plex Mono',monospace;white-space:nowrap}
+.formula small{display:block;font:400 15px 'Inter',sans-serif;color:var(--faint);margin-top:6px}
+.lvbar{display:flex;margin-top:22px}
+.lvbar>div{flex:1;padding:12px 12px 14px;color:#fff;margin-right:3px}
+.lvbar>div:last-child{margin-right:0}
+.lvbar b{display:block;font:600 19px 'Fraunces',serif}
+.lvbar i{display:block;font:500 14px 'IBM Plex Mono',monospace;margin-top:4px;opacity:.9;font-style:normal}
+.nm{position:absolute;left:120px;bottom:70px;display:flex;align-items:center}
+.nm .t1{font:600 80px/1 'Fraunces',serif;letter-spacing:-.02em;margin-left:22px}
+.nm .t1 em{font-style:normal;color:var(--em)}
+.nm .t2{margin-left:36px;font:500 17px/1.6 'IBM Plex Mono',monospace;color:var(--soft);letter-spacing:.03em}
+
+/* ---------- 5 : réalisation ---------- */
+.arch{display:flex;align-items:stretch;margin-top:44px}
+.abox{flex:1;border:1px solid var(--line);padding:22px 22px 24px;background:#fff;position:relative}
+.abox.core{border-color:var(--em);border-top-width:3px}
+.abox b{display:block;font:500 25px/1.15 'Fraunces',serif}
+.abox span{display:block;font:400 17px/1.45 'Inter',sans-serif;color:var(--soft);margin-top:10px}
+.abox .chip{display:inline-block;margin-top:14px;font:500 13px 'IBM Plex Mono',monospace;color:var(--em);border:1px solid var(--em);padding:4px 9px;letter-spacing:.04em}
+.aarrow{width:54px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.badges{display:flex;margin-top:40px}
+.badge{width:158px;margin-right:16px;border:1px solid var(--line);padding:18px 20px;background:#fff}
+.badge .n{font:600 50px/1 'Fraunces',serif;color:var(--em)}
+.badge .l{font:400 16px/1.35 'Inter',sans-serif;color:var(--soft);margin-top:8px}
+.incident{position:absolute;left:860px;top:500px;width:620px;padding:26px 30px;border:1px solid var(--gold);background:#fffdf7}
+.incident .h{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+.incident p{font:400 22px/1.5 'Inter',sans-serif;margin-top:12px}
+.why{position:absolute;left:120px;right:120px;bottom:92px;font:400 20px/1.5 'Inter',sans-serif;color:var(--soft);border-top:1px solid var(--line);padding-top:18px}
+.why b{color:var(--ink);font-weight:600}
+
+/* ---------- 6 : maquette ---------- */
+.fr{position:absolute;left:120px;top:122px;width:1360px;height:716px;border:1px solid var(--line);background:var(--paper);
+  box-shadow:0 30px 70px -30px rgba(16,32,47,.28)}
+.fr .chrome{height:38px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;background:#fff}
+.fr .chrome i{width:10px;height:10px;border-radius:50%;background:rgba(16,32,47,.18);margin-right:7px}
+.fr .chrome span{margin-left:14px;font:500 13px 'IBM Plex Mono',monospace;color:var(--faint);background:rgba(16,32,47,.05);padding:4px 14px}
+.fr .tag{margin-left:auto;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.apphd{height:60px;display:flex;align-items:center;padding:0 30px;border-bottom:1px solid var(--line)}
+.apphd .wm{font-size:24px;margin-left:12px}
+.profs{margin-left:auto;display:flex}
+.pbtn{display:flex;align-items:center;border:1px solid var(--line);background:transparent;padding:9px 16px;margin-left:10px;cursor:pointer;
+  font:500 16px 'Inter',sans-serif;color:var(--soft);transition:all .2s}
+.pbtn kbd{font:500 13px 'IBM Plex Mono',monospace;margin-right:10px;color:var(--faint)}
+.pbtn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)} .pbtn.on kbd{color:#7fd8c4}
+.appbody{position:relative;height:600px}
+.res-l{position:absolute;left:34px;top:26px;width:330px}
+.res-l .org{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.res-l .sc{font:600 136px/1 'IBM Plex Mono',monospace;letter-spacing:-.04em;margin-top:16px}
+.res-l .sc small{font-size:34px;color:var(--faint);letter-spacing:0;margin-left:6px}
+.res-l .lv{font:500 38px/1.1 'Fraunces',serif;margin-top:10px}
+.res-l .sm{font:400 17px/1.5 'Inter',sans-serif;color:var(--soft);margin-top:16px;max-width:300px}
+.radar-box{position:absolute;left:340px;top:6px;width:520px;height:420px}
+.rows{position:absolute;left:870px;top:30px;width:460px}
+.drow{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.drow .n{width:150px;font:400 17px 'Inter',sans-serif}
+.drow .b{flex:1;height:4px;background:rgba(16,32,47,.1);position:relative}
+.drow .b i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .8s cubic-bezier(.22,.61,.36,1),background .4s}
+.drow .s{width:46px;text-align:right;font:600 17px 'IBM Plex Mono',monospace}
+.drow .l{width:78px;text-align:right;font:500 14px 'Inter',sans-serif}
+.prio{position:absolute;left:34px;right:34px;top:432px;border-top:1px solid var(--ink);padding-top:14px}
+.prio .h{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.prio .list{display:flex;margin-top:12px;transition:opacity .25s}
+.prio .list.swap{opacity:0}
+.pr{flex:1;margin-right:22px;border-left:3px solid var(--coral);padding:2px 0 2px 16px}
+.pr:last-child{margin-right:0}
+.pr .sv{font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+.pr .tt{font:500 18px/1.35 'Inter',sans-serif;margin-top:6px}
+.pr .dm{font:400 14px 'IBM Plex Mono',monospace;color:var(--faint);margin-top:6px}
+.halo{transform-box:fill-box;transform-origin:center;animation:halo 1.8s ease-out infinite}
+@keyframes halo{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3);opacity:0}}
+
+/* ---------- 7 : démo ---------- */
+.demo-l{position:absolute;left:120px;top:210px;width:760px}
+.demo-l h1{font:500 118px/.98 'Fraunces',serif;letter-spacing:-.03em;margin-top:30px}
+.demo-l h1 em{font-style:normal;color:var(--em)}
+.demo-l p{font:400 28px/1.5 'Inter',sans-serif;color:var(--soft);margin-top:34px;max-width:640px}
+.live{display:flex;align-items:center;margin-top:44px;font:500 17px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--coral);text-transform:uppercase}
+.live i{width:14px;height:14px;border-radius:50%;background:var(--coral);margin-right:14px;position:relative}
+.live i:after{content:'';position:absolute;left:-8px;top:-8px;right:-8px;bottom:-8px;border-radius:50%;border:2px solid var(--coral);animation:ping 1.8s ease-out infinite}
+@keyframes ping{0%{transform:scale(.5);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.steps3{position:absolute;left:1000px;top:190px;width:480px}
+.stp{display:flex;align-items:flex-start;padding:30px 0;border-top:1px solid var(--line)}
+.stp:last-child{border-bottom:1px solid var(--line)}
+.stp .n{font:600 56px/1 'IBM Plex Mono',monospace;color:var(--gold);width:96px;flex-shrink:0}
+.stp b{display:block;font:500 28px/1.2 'Fraunces',serif}
+.stp span{display:block;font:400 18px/1.45 'Inter',sans-serif;color:var(--soft);margin-top:8px}
+
+/* ---------- 8 : bilan ---------- */
+.self-radar{position:absolute;left:90px;top:130px;width:700px;height:660px}
+.self-r{position:absolute;left:860px;top:150px;width:620px}
+.self-r h2{font:500 50px/1.1 'Fraunces',serif;letter-spacing:-.015em}
+.self-r h2 em{font-style:normal;color:var(--em)}
+.gl{display:flex;align-items:baseline;margin-top:30px}
+.gl .v{font:600 112px/1 'IBM Plex Mono',monospace;letter-spacing:-.04em}
+.gl .lv{font:500 40px 'Fraunces',serif;margin-left:20px;color:var(--olive)}
+.self-r .nt{font:400 19px/1.5 'Inter',sans-serif;color:var(--faint);margin-top:6px;max-width:560px}
+.self-r .plist{margin-top:34px;border-top:1px solid var(--ink)}
+.self-r .plist .h{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:14px 0 6px}
+.pi{display:flex;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
+.pi .sv{width:104px;flex-shrink:0;font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;padding-top:4px}
+.pi b{display:block;font:500 22px/1.3 'Inter',sans-serif}
+.pi span{display:block;font:400 16px/1.4 'Inter',sans-serif;color:var(--soft);margin-top:3px}
+
+/* ---------- 9 : merci ---------- */
+.thx{position:absolute;left:120px;top:130px}
+.thx h1{font:500 170px/.9 'Fraunces',serif;letter-spacing:-.04em;max-width:820px}
+.thx h1 em{font-style:normal;color:var(--em)}
+.thx p{font:400 32px/1.4 'Inter',sans-serif;color:var(--soft);margin-top:30px}
+.thx .links{margin-top:40px;font:500 18px/1.9 'IBM Plex Mono',monospace;color:var(--soft)}
+.thx-logo{position:absolute;left:1080px;top:150px;width:400px;height:400px}
+.thx-name{position:absolute;left:1020px;top:600px;width:460px;text-align:center;font:600 64px 'Fraunces',serif;letter-spacing:-.02em}
+.thx-name em{font-style:normal;color:var(--em)}
+.thx-sub{position:absolute;left:1020px;top:684px;width:460px;text-align:center;font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--faint)}
+
+/* ---------- Plan B ---------- */
+#planB{position:absolute;inset:0;z-index:40;background:var(--paper);display:none}
+#planB.on{display:block}
+.pbf{position:absolute;left:250px;top:90px;width:1100px;height:700px;border:1px solid var(--line);background:var(--paper);box-shadow:0 30px 70px -30px rgba(16,32,47,.3)}
+.pbf .chrome{height:38px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;background:#fff}
+.pbf .chrome i{width:10px;height:10px;border-radius:50%;background:rgba(16,32,47,.18);margin-right:7px}
+.pbf .chrome span{margin-left:14px;font:500 13px 'IBM Plex Mono',monospace;color:var(--faint);background:rgba(16,32,47,.05);padding:4px 14px}
+.pbv{position:absolute;left:0;right:0;top:38px;bottom:0;padding:38px 48px;opacity:0;transition:opacity .6s ease}
+.pbv.on{opacity:1}
+.pbcap{position:absolute;left:0;right:0;bottom:40px;text-align:center;font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--faint)}
+.pbk{position:absolute;right:30px;top:28px;font:500 13px 'IBM Plex Mono',monospace;color:var(--faint)}
+.pb-t{font:500 38px/1.1 'Fraunces',serif;letter-spacing:-.015em;margin-top:18px}
+.pb-in{display:flex;margin-top:34px}
+.pb-in>div{margin-right:22px;width:300px}
+.pb-in .l{font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.pb-in .v{border-bottom:1px solid var(--line);padding:8px 0;font:400 20px 'Inter',sans-serif;margin-top:6px}
+.pb-modes{display:flex;margin-top:28px;width:600px;border:1px solid var(--line)}
+.pb-modes div{flex:1;padding:14px 18px;font:400 18px 'Inter',sans-serif}
+.pb-modes .on{background:var(--ink);color:var(--paper)}
+.pb-btn{display:inline-block;margin-top:26px;background:var(--em);color:#fff;padding:14px 28px;font:500 19px 'Inter',sans-serif}
+.pb-demo{display:flex;margin-top:30px}
+.pb-demo div{border:1px solid var(--line);padding:12px 20px;margin-right:12px;font:500 17px 'Inter',sans-serif}
+.pb-demo .sel{border-color:var(--em);background:rgba(10,125,104,.08);color:var(--em)}
+.pdfpg{width:400px;height:470px;border:1px solid var(--line);background:#fff;padding:30px 34px;margin:22px auto 0;box-shadow:0 12px 30px -12px rgba(16,32,47,.25)}
+.pdfpg h4{font:600 22px/1.2 'Fraunces',serif;color:var(--ink)}
+.pdfpg .eb{font:500 10px 'IBM Plex Mono',monospace;color:var(--em);letter-spacing:.1em;margin-bottom:8px}
+.pdfpg .bars2{display:flex;align-items:flex-end;height:120px;margin-top:20px;border-bottom:1px solid var(--ink)}
+.pdfpg .bars2 i{flex:1;margin:0 8px;background:var(--em);display:block}
+.pdfpg .tb{margin-top:18px;font:400 12px/1.9 'Inter',sans-serif}
+.pdfpg .tb div{display:flex;border-bottom:1px solid #eee}
+.pdfpg .tb span{flex:1}.pdfpg .tb b{font-weight:600}
+.pdfpg .rc{font:400 13px/1.5 'Inter',sans-serif;margin-top:14px}
+.pdfpg .rc b{color:var(--orange)}
+
+/* ---------- mode impression (PDF de secours) ---------- */
+body.print{overflow:visible;height:auto}
+.print .stage{position:static;margin:0;transform:none;height:auto;overflow:visible}
+.print .slide{position:relative;opacity:1;visibility:visible;break-after:page;page-break-after:always;overflow:hidden}
+.print .slide:last-of-type{break-after:auto;page-break-after:auto}
+.print *{transition:none!important;animation:none!important}
+.print .hud-ch,.print .hud-timer,.print .navbar,.print #notes,.print #help,.print #planB{display:none!important}
+.print .halo{display:none}
+@page{size:1600px 900px;margin:0}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+<div class="hud-ch" id="hudCh"><span id="hudLabel"></span><svg id="hudPent" width="56" height="56" viewBox="0 0 56 56"></svg></div>
+<div class="hud-timer" id="hudTimer"><b id="tTotal">00:00</b> / 10:00<span class="sl" id="tSlide"></span></div>
+
+<!-- 0&nbsp;: couverture -->
+<section class="slide active" data-budget="0" data-chapter="-1">
+  <div class="eyebrow rv" style="--d:.1s">Soutenance · Projet de fin d'année · 2026</div>
+  <h1 class="cover-h rv" style="--d:.25s">Concevoir une plateforme d'auto-évaluation de la <em>maturité cybersécurité</em> pour les PME marocaines</h1>
+  <div class="people rv" style="--d:.55s">
+    <div><span>Stagiaire</span><b>Youssef Ait Karroum</b><i>Cycle ingénieur IACS · ENSA Béni Mellal</i></div>
+    <div><span>Encadrant professionnel</span><b>Dr. Rachid Abouettahir</b><i>CMRPI · Espace Maroc Cyberconfiance</i></div>
+    <div><span>Encadrante académique</span><b>Zakia Errabih</b><i>ESTF · Université Sidi Mohamed Ben Abdellah</i></div>
+  </div>
+  <svg class="cover-pent" id="coverPent" viewBox="0 0 520 560"></svg>
+  <div class="cover-foot rv" style="--d:.8s">CMRPI × ENSA BÉNI MELLAL — UNIVERSITÉ SULTAN MOULAY SLIMANE</div>
+</section>
+
+<!-- 1&nbsp;: le constat -->
+<section class="slide" data-budget="35" data-chapter="0">
+  <div class="eyebrow rv" style="--d:.05s">Le constat</div>
+  <div class="big60 rv" style="--d:.15s"><span class="count" data-to="60">0</span><span class="pc">%</span></div>
+  <div class="s1-sub rv" style="--d:.35s">des cyberattaques recensées au Maroc visent des <b>PME</b>, pas des grands groupes.</div>
+  <div class="src rv" style="--d:.5s;margin-top:34px">DGSSI, 2025</div>
+  <div class="matrix rv" style="--d:.2s">
+    <div class="lab">Sur 100 cyberattaques</div>
+    <div class="dots" id="dots"></div>
+    <div class="legend"><span><i style="background:var(--coral)"></i>60 visent une PME</span><span><i style="background:var(--dot)"></i>40 autres cibles</span></div>
+  </div>
+</section>
+
+<!-- 2&nbsp;: paradoxe -->
+<section class="slide" data-budget="45" data-chapter="0">
+  <div class="eyebrow rv" style="--d:.05s">Le paradoxe</div>
+  <div class="cols3">
+    <div class="rv" style="--d:.2s"><div class="bignum"><span class="count" data-to="879">0</span></div>
+      <div class="cap">cyberattaques traitées par la DGSSI en 2025, dont 109 avec intervention du maCERT.</div><div class="src" style="margin-top:16px">DGSSI, rapport annuel 2025</div></div>
+    <div class="rv" style="--d:.45s"><div class="bignum sm" style="color:var(--em)">Tier 1</div>
+      <div class="cap">classement mondial du Maroc à l'indice de cybersécurité de l'ITU&nbsp;: 97,5 sur 100.</div><div class="src" style="margin-top:16px">ITU, 2024</div></div>
+    <div class="rv" style="--d:.7s"><div class="bignum sm" style="color:var(--coral);white-space:nowrap">40<span style="font-size:62px;margin-left:12px;letter-spacing:-.01em">pages</span></div>
+      <div class="cap">c'est la taille du guide CMRPI/AUSIM&nbsp;: un document statique, pas un outil.</div><div class="src" style="margin-top:16px">Guide de bonnes pratiques CMRPI/AUSIM</div></div>
+  </div>
+  <div class="punch rv" style="--d:1.2s">Un cadre national de premier rang, mais à ce jour <em>aucun moyen simple</em> pour une PME de savoir où elle en est.</div>
+</section>
+
+<!-- 3&nbsp;: contexte -->
+<section class="slide" data-budget="45" data-chapter="1">
+  <div class="ctx-left">
+    <div class="eyebrow rv" style="--d:.05s">Chapitre 1 · Le contexte</div>
+    <h2 class="t rv" style="--d:.15s">Le CMRPI et l'Espace Maroc Cyberconfiance</h2>
+    <p class="rv" style="--d:.3s"><b>CMRPI</b>&nbsp;: association savante à but non lucratif, fondée en <b>juin 2012</b> par le Pr. Youssef Bentaleb. Depuis <b>septembre 2020</b>, son initiative <b>EMC</b> traite les signalements de cyberviolence, avec l'appui du Conseil de l'Europe.</p>
+  </div>
+  <div class="chart rv" style="--d:.4s">
+    <div class="lab">Signalements EMC-Helpline</div>
+    <div class="bars">
+      <div class="bcol"><div class="v">64</div><div class="bar" style="--h:11px;--d:.5s"></div></div>
+      <div class="bcol"><div class="v">548</div><div class="bar" style="--h:94px;--d:.7s"></div></div>
+      <div class="bcol"><div class="v">1 227</div><div class="bar peak" style="--h:210px;--d:.9s"></div></div>
+      <div class="bcol"><div class="v">574</div><div class="bar" style="--h:98px;--d:1.1s"></div></div>
+    </div>
+    <div class="years"><span>2021</span><span>2022</span><span>2023</span><span>2024</span></div>
+    <div class="note">Cyberviolence envers les particuliers (pic 2023&nbsp;: séisme d'Al Haouz). Cité pour l'engagement du CMRPI, pas comme donnée PME.</div>
+  </div>
+  <div class="quote rv" style="--d:.9s">
+    <q>Comment concevoir une plateforme simple et accessible permettant à une PME marocaine d'auto-évaluer sa maturité cybersécurité, et d'obtenir des recommandations priorisées et actionnables&nbsp;?</q>
+    <div class="qs">La problématique du stage</div>
+  </div>
+</section>
+
+<!-- 4&nbsp;: méthode -->
+<section class="slide" data-budget="75" data-chapter="1" data-steps="2">
+  <div class="eyebrow rv" style="--d:.05s;position:absolute;left:120px;top:84px">Chapitre 2 · La méthode</div>
+  <svg class="pent-wrap" id="domPent" viewBox="0 0 780 620"></svg>
+  <div class="refs">
+    <div class="refs-h rv" style="--d:.3s">Cinq domaines, quatre sources, <em>un score</em>.</div>
+    <div class="st1" style="--d:0s"><div class="row"><div class="k">SOURCE</div><div class="v">Guide CMRPI/AUSIM<small>référentiel métier, bonnes pratiques PME</small></div></div></div>
+    <div class="st1" style="--d:.12s"><div class="row"><div class="k">NORME</div><div class="v">ISO/IEC 27001:2022<small>4 thèmes de l'Annexe A (A.5 à A.8)</small></div></div></div>
+    <div class="st1" style="--d:.24s"><div class="row"><div class="k">FRAMEWORK</div><div class="v">NIST CSF 2.0<small>6 fonctions, dont Govern (ajout 2024)</small></div></div></div>
+    <div class="st1" style="--d:.36s"><div class="row"><div class="k">LOI</div><div class="v">Loi 09-08<small>consentement explicite dans le parcours</small></div></div></div>
+    <div class="st1" style="--d:.55s"><div class="formula">Score domaine = ((moyenne Likert - 1) / 4) × 100<small>25 questions · 5 domaines · échelle de Likert à 5 niveaux</small></div></div>
+    <div class="st1" style="--d:.7s"><div class="lvbar">
+      <div style="background:var(--coral)"><b>Critique</b><i>[0, 25[</i></div>
+      <div style="background:var(--orange)"><b>Faible</b><i>[25, 50[</i></div>
+      <div style="background:var(--olive)"><b>Moyen</b><i>[50, 75[</i></div>
+      <div style="background:var(--em)"><b>Avancé</b><i>[75, 100]</i></div></div></div>
+  </div>
+  <div class="nm st2" style="--d:.2s"><svg id="nmLogo" width="84" height="84" viewBox="0 0 100 100"></svg>
+    <div class="t1">Penta<em>score</em></div>
+    <div class="t2">Penta&nbsp;: les 5 domaines<br>Score&nbsp;: votre résultat</div></div>
+</section>
+
+<!-- 5&nbsp;: réalisation -->
+<section class="slide" data-budget="60" data-chapter="2">
+  <div class="eyebrow rv" style="--d:.05s">Chapitre 3 · La réalisation</div>
+  <h2 class="t rv" style="--d:.15s">Une architecture volontairement simple, une qualité volontairement stricte</h2>
+  <div class="arch rv" style="--d:.4s">
+    <div class="abox"><b>Navigateur</b><span>dirigeant de PME, aucune installation</span></div>
+    <div class="aarrow"><svg width="30" height="20" viewBox="0 0 30 20"><path d="M2 10 H26 M19 3 L27 10 L19 17" fill="none" stroke="#10202F" stroke-width="1.6"/></svg></div>
+    <div class="abox"><b>app.py · Streamlit</b><span>écrans, deux modes de questionnaire, résultats</span></div>
+    <div class="aarrow"><svg width="30" height="20" viewBox="0 0 30 20"><path d="M2 10 H26 M19 3 L27 10 L19 17" fill="none" stroke="#10202F" stroke-width="1.6"/></svg></div>
+    <div class="abox core" style="flex:1.5"><b>src/</b><span>scoring · questionnaire · database · pdf_generator</span><div class="chip">Python pur, testable sans interface</div></div>
+    <div class="aarrow"><svg width="30" height="20" viewBox="0 0 30 20"><path d="M2 10 H26 M19 3 L27 10 L19 17" fill="none" stroke="#10202F" stroke-width="1.6"/></svg></div>
+    <div class="abox"><b>SQLite</b><span>7 tables, 47 recommandations</span></div>
+  </div>
+  <div class="badges rv" style="--d:.7s;position:absolute;left:120px;top:486px">
+    <div class="badge"><div class="n">52</div><div class="l">tests automatisés</div></div>
+    <div class="badge"><div class="n">90%</div><div class="l">couverture de code</div></div>
+    <div class="badge"><div class="n">0</div><div class="l">erreur de lint (flake8)</div></div>
+    <div class="badge"><div class="n">CI</div><div class="l">GitHub Actions à chaque push</div></div>
+  </div>
+  <div class="incident rv" style="--d:.9s"><div class="h">Un incident utile</div>
+    <p>Sur un environnement vierge, <b>3 régressions de dépendances</b> invisibles en local (pandas, Streamlit, flake8). Corrigées, puis verrouillées par la CI.</p></div>
+  <div class="why rv" style="--d:1.1s"><b>Streamlit</b>&nbsp;: prototypage en sept semaines · <b>SQLite</b>&nbsp;: zéro infrastructure · <b>ReportLab</b>&nbsp;: PDF en Python pur</div>
+</section>
+
+<!-- 6&nbsp;: maquettes -->
+<section class="slide" data-budget="85" data-chapter="3" id="s6">
+  <div class="eyebrow rv" style="--d:.05s">Le produit · maquettes du futur frontend</div>
+  <div class="fr rv" style="--d:.2s">
+    <div class="chrome"><i></i><i></i><i></i><span>maquette · pentascore</span><div class="tag">Maquette, pas encore branchée au backend</div></div>
+    <div class="apphd"><svg id="appLogo" width="30" height="30" viewBox="0 0 100 100"></svg><span class="wm">Penta<em>score</em></span>
+      <div class="profs" data-ui>
+        <button class="pbtn on" data-p="finance" tabindex="-1"><kbd>1</kbd>Finance</button>
+        <button class="pbtn" data-p="commerce" tabindex="-1"><kbd>2</kbd>Commerce</button>
+        <button class="pbtn" data-p="techno" tabindex="-1"><kbd>3</kbd>Technologie</button>
+      </div></div>
+    <div class="appbody">
+      <div class="res-l"><div class="org" id="rOrg">PME Finance · Finance</div>
+        <div class="sc"><span id="rScore">0</span><small>/100</small></div>
+        <div class="lv" id="rLevel">Faible</div>
+        <div class="sm" id="rSum">Deux à trois actions, choisies selon les domaines les plus faibles.</div></div>
+      <svg class="radar-box" id="radar1" viewBox="0 0 520 420"></svg>
+      <div class="rows" id="rows"></div>
+      <div class="prio"><div class="h">Vos priorités</div><div class="list" id="recs"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7&nbsp;: démo live -->
+<section class="slide" data-budget="120" data-chapter="3">
+  <div class="demo-l">
+    <div class="eyebrow rv" style="--d:.05s">Place à l'outil</div>
+    <h1 class="rv" style="--d:.2s">L'application <em>réelle</em>.</h1>
+    <p class="rv" style="--d:.45s">Python, Streamlit, base SQLite&nbsp;: celle qui passe les 52 tests.</p>
+    <div class="live rv" style="--d:.6s"><i></i>Démonstration en direct</div>
+  </div>
+  <div class="steps3">
+    <div class="stp rv" style="--d:.5s"><div class="n">01</div><div><b>Charger un profil</b><span>PME Finance, en un clic</span></div></div>
+    <div class="stp rv" style="--d:.7s"><div class="n">02</div><div><b>Lire le résultat</b><span>score, radar, domaine le plus faible</span></div></div>
+    <div class="stp rv" style="--d:.9s"><div class="n">03</div><div><b>Exporter le rapport</b><span>PDF avec 2 à 3 recommandations</span></div></div>
+  </div>
+</section>
+
+<!-- 8&nbsp;: bilan -->
+<section class="slide" data-budget="75" data-chapter="4" data-steps="1">
+  <div class="eyebrow rv" style="--d:.05s;position:absolute;left:120px;top:84px">Bilan</div>
+  <svg class="self-radar" id="radar2" viewBox="0 0 700 660"></svg>
+  <div class="self-r">
+    <h2 class="rv" style="--d:.2s">J'ai appliqué la grille <em>à mon propre stage</em>.</h2>
+    <div class="gl rv" style="--d:.4s"><div class="v"><span id="selfScore">0</span><span style="font-size:48px;color:var(--faint)">%</span></div><div class="lv" id="selfLevel">Moyen</div></div>
+    <div class="nt rv" style="--d:.5s">Auto-évaluation&nbsp;: subjective, comme celle d'une PME. C'est pourquoi la validation externe passe en premier.</div>
+    <div class="plist st1" style="--d:.1s"><div class="h">Mes priorités</div>
+      <div class="pi"><div class="sv" style="color:var(--coral)">Haute</div><div><b>Valider avec des PME pilotes</b><span>aujourd'hui, seulement 3 profils fictifs</span></div></div>
+      <div class="pi"><div class="sv" style="color:var(--olive)">Moyenne</div><div><b>Déployer en ligne</b><span>Streamlit Community Cloud, puis hébergement pérenne</span></div></div>
+      <div class="pi"><div class="sv" style="color:var(--olive)">Moyenne</div><div><b>Migrer vers FastAPI, React et PostgreSQL</b><span>le frontend Pentascore, multi-utilisateurs</span></div></div></div>
+  </div>
+</section>
+
+<!-- 9&nbsp;: merci -->
+<section class="slide" data-budget="15" data-chapter="4">
+  <div class="thx">
+    <div class="eyebrow rv" style="--d:.05s">Merci de votre attention</div>
+    <h1 class="rv" style="--d:.2s;margin-top:26px">Des <em>questions&nbsp;?</em></h1>
+    <p class="rv" style="--d:.45s">Un produit, un score, cinq domaines.</p>
+    <div class="links rv" style="--d:.6s">github.com/YOUSSEFKARROUM/PFA_CRMPI<br>youssefaitkarroum.pro@gmail.com</div>
+  </div>
+  <svg class="thx-logo" id="thxLogo" viewBox="0 0 100 100"></svg>
+  <div class="thx-name rv" style="--d:.5s">Penta<em>score</em></div>
+  <div class="thx-sub rv" style="--d:.6s">PAR CMRPI · ESPACE MAROC CYBERCONFIANCE</div>
+</section>
+
+<!-- plan B -->
+<div id="planB">
+  <div class="pbk">D pour fermer</div>
+  <div class="pbf">
+    <div class="chrome"><i></i><i></i><i></i><span>localhost:8501</span></div>
+    <div class="pbv on">
+      <div class="eyebrow" style="font-size:13px">Pentascore · par CMRPI</div>
+      <div class="pb-t">Auto-évaluation de la maturité cybersécurité</div>
+      <div class="pb-in"><div><div class="l">Nom de l'organisation</div><div class="v">PME Finance</div></div><div><div class="l">Secteur d'activité</div><div class="v">Finance</div></div></div>
+      <div class="pb-modes"><div class="on">Par section</div><div>Question par question</div></div>
+      <div class="pb-btn">Commencer le questionnaire</div>
+      <div class="pb-demo"><div class="sel">PME Finance</div><div>PME Commerce</div><div>PME Technologie</div></div>
+    </div>
+    <div class="pbv">
+      <div class="eyebrow" style="font-size:13px">Résultat de l'auto-évaluation</div>
+      <div class="pb-t">PME Finance</div>
+      <div style="display:flex;align-items:center;margin-top:20px">
+        <div style="width:280px"><div class="mono" style="font-weight:600;font-size:110px;line-height:1;letter-spacing:-.04em">44<small style="font-size:30px;color:var(--faint)">%</small></div><div class="serif" style="font-size:32px;color:var(--orange);margin-top:8px">Faible</div></div>
+        <svg id="pbRadar" width="380" height="310" viewBox="0 0 520 420"></svg>
+        <div style="flex:1;margin-left:20px;font:400 17px/2.2 'Inter',sans-serif" id="pbRows"></div>
+      </div>
+    </div>
+    <div class="pbv"><div class="eyebrow" style="font-size:13px">Rapport PDF · page 1</div>
+      <div class="pdfpg"><div class="eb">PENTASCORE · PAR CMRPI</div><h4>Rapport d'auto-évaluation de la maturité cybersécurité</h4>
+        <div class="mono" style="font-size:12px;margin-top:14px;color:var(--soft)">Organisation&nbsp;: PME Finance · Secteur&nbsp;: Finance</div>
+        <div style="margin-top:16px;font:600 30px 'Fraunces',serif">Score global&nbsp;: 44,0 %</div>
+        <div class="bars2"><i style="height:50%"></i><i style="height:55%"></i><i style="height:35%"></i><i style="height:50%"></i><i style="height:30%"></i></div>
+        <div class="tb"><div><span>Gouvernance</span><b>50 %</b></div><div><span>Accès &amp; Identités</span><b>55 %</b></div><div><span>Infrastructure &amp; Réseau</span><b>35 %</b></div><div><span>Incidents &amp; Continuité</span><b>50 %</b></div><div><span>Sensibilisation &amp; Formation</span><b>30 %</b></div></div></div></div>
+    <div class="pbv"><div class="eyebrow" style="font-size:13px">Rapport PDF · page 2</div>
+      <div class="pdfpg"><div class="eb">RECOMMANDATIONS PRIORITAIRES</div>
+        <div class="rc"><b>[Haute]</b> Sensibilisation &amp; Formation&nbsp;: dispenser une formation cybersécurité annuelle à tous les employés</div>
+        <div class="rc"><b>[Haute]</b> Sensibilisation &amp; Formation&nbsp;: tester la vigilance des employés via des simulations de phishing</div>
+        <div class="rc"><b>[Haute]</b> Sensibilisation &amp; Formation&nbsp;: intégrer un module cybersécurité à l'onboarding des nouveaux employés</div>
+        <div class="mono" style="font-size:10px;color:var(--faint);margin-top:30px">Sélectionnées selon les domaines aux réponses les plus faibles.</div></div></div>
+    <div class="pbcap">Séquence de démonstration rejouée · l'application réelle fonctionne en local</div>
+  </div>
+</div>
+
+<div id="notes"><b id="notesH"></b><div id="notesT"></div></div>
+<div id="help"><h3>Raccourcis</h3>
+  <div><kbd>Flèche droite</kbd> / <kbd>Espace</kbd> suivant &nbsp;·&nbsp; <kbd>Flèche gauche</kbd> précédent</div>
+  <div><kbd>T</kbd> chronomètre &nbsp;·&nbsp; <kbd>N</kbd> notes du présentateur</div>
+  <div><kbd>D</kbd> plan B (séquence de démo rejouée) &nbsp;·&nbsp; <kbd>F</kbd> plein écran</div>
+  <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> profil de la maquette &nbsp;·&nbsp; <kbd>R</kbd> remettre le chrono à zéro</div>
+  <div><kbd>H</kbd> cette aide &nbsp;·&nbsp; <kbd>Échap</kbd> fermer</div></div>
+
+<div class="navbar" id="navbar"><span id="cnt">01 / 10</span><div class="prog"><i id="progFill"></i></div><span id="stepDots"></span></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* =====================  CONFIG MODIFIABLE  ===================== */
+var PROJECT_SELF = {
+  labels: ['Cadrage','Sources','Qualité|logicielle','Gestion des|incidents','Validation|terrain'],
+  scores: [85, 80, 75, 85, 25]      // auto-évaluation du stage (0-100), à ajuster honnêtement
+};
+var PRINT = /[?&]print\b/.test(location.search);
+
+/* =====================  DONNÉES  ===================== */
+var DOMAINS = ['Gouvernance','Accès &|Identités','Infrastructure|& Réseau','Incidents &|Continuité','Sensibilisation|& Formation'];
+var DOM_ROWS = ['Gouvernance','Accès & Identités','Infrastructure & Réseau','Incidents & Continuité','Sensibilisation & Formation'];
+var DESC = ['politique · pilotage','authentification','pare-feu · sauvegardes','plan de réponse','vigilance des équipes'];
+var PROFILES = {
+  finance:{org:'PME Finance · Finance', scores:[50,55,35,50,30], recs:[
+    ['Haute','Dispenser une formation cybersécurité annuelle à tous les employés','Sensibilisation & Formation'],
+    ['Haute','Tester la vigilance via des simulations de phishing','Sensibilisation & Formation'],
+    ['Haute','Intégrer un module cybersécurité à l\'onboarding','Sensibilisation & Formation']]},
+  commerce:{org:'PME Commerce · Commerce', scores:[25,20,20,15,20], recs:[
+    ['Critique','Créer un plan de réponse aux incidents documenté','Incidents & Continuité'],
+    ['Critique','Tester les sauvegardes trimestriellement','Incidents & Continuité'],
+    ['Haute','Élaborer un plan de continuité métier (BCP/DRP)','Incidents & Continuité']]},
+  techno:{org:'PME Technologie · Technologie', scores:[80,90,95,80,70], recs:[
+    ['Moyenne','Documenter et faire signer la politique d\'utilisation acceptable','Sensibilisation & Formation'],
+    ['Moyenne','Sensibiliser aux risques d\'ingénierie sociale','Sensibilisation & Formation'],
+    ['Moyenne','Documenter une politique de télétravail sécurisé','Sensibilisation & Formation']]}
+};
+var SEV_COLOR = {Critique:'#D24A2E',Haute:'#D9822B',Moyenne:'#8A8A1F',Basse:'#0A7D68'};
+var CHAPTERS = ['Constat','Contexte & méthode','Réalisation','Produit','Bilan'];
+var NOTES = [
+ "Bonjour. Je m'appelle Youssef Ait Karroum. En dix minutes, je vous présente le projet de mon stage de sept semaines au CMRPI : une plateforme qui permet à une PME marocaine de mesurer sa propre maturité cybersécurité.\n[Flèche droite : le chronomètre démarre.]",
+ "Soixante pour cent des cyberattaques recensées au Maroc visent des PME (DGSSI). Sur cent attaques, soixante tombent sur une petite structure, qui a en général bien moins de moyens de défense qu'un grand groupe.",
+ "En 2025, la DGSSI a traité 879 cyberattaques, dont 109 avec le maCERT. Le Maroc est classé Tier 1 mondial par l'ITU, 97,5 sur 100 : le cadre national est solide. Le CMRPI a publié avec l'AUSIM un guide de bonnes pratiques : une quarantaine de pages, un document, pas un outil. À ce jour, une PME n'a pas de moyen simple de savoir où elle en est. C'est l'écart que mon stage devait combler.",
+ "Le CMRPI est une association savante fondée en 2012 par le Pr. Bentaleb. Depuis 2020, l'Espace Maroc Cyberconfiance traite des signalements : 64 en 2021, 1 227 en 2023, pic lié au séisme d'Al Haouz. Précision importante : ces chiffres concernent des particuliers, pas des PME. Je les cite pour l'engagement du CMRPI. Ma problématique : [lire la citation].",
+ "Cinq domaines : gouvernance, accès et identités, infrastructure, incidents et continuité, sensibilisation.\n[Flèche : référentiels] Ils croisent quatre sources : le guide CMRPI/AUSIM, l'ISO 27001 version 2022, le NIST CSF 2.0 qui compte six fonctions depuis l'ajout de Govern, et la loi 09-08. 25 questions, échelle de Likert à 5 niveaux, score de 0 à 100, quatre niveaux aux bornes sans chevauchement.\n[Flèche : le nom] Cinq domaines, un score : je l'ai appelée Pentascore.",
+ "Architecture volontairement simple pour sept semaines : Streamlit, SQLite, ReportLab. Les modules de calcul sont en Python pur, testables sans interface. Qualité : 52 tests dont des tests de bout en bout qui simulent un utilisateur, 90 % de couverture, zéro erreur de lint, intégration continue. Anecdote : sur un environnement vierge, trois régressions de dépendances sont apparues, invisibles en local. Corrigées, puis verrouillées par la CI. Et le brief demandait une question par écran ou par section : j'ai fait les deux.",
+ "Voici la direction du futur frontend Pentascore, en maquette. Je laisse le jury choisir un profil : touches 1, 2, 3.\nFinance, 44 % : le plus faible est la sensibilisation, donc trois actions ciblées dessus.\nCommerce, 20 % : critique, incidents et continuité à 15 %.\nTechnologie, 83 % : avancé, seulement des pistes d'optimisation, jamais de fausse alerte.\nCe n'est qu'une maquette. Place à l'application réelle.",
+ "[Alt+Tab vers localhost:8501]\n1. Cliquer « PME Finance » : résultats.\n2. Lire : 44 %, Faible, radar, domaine le plus faible.\n3. Télécharger le PDF, l'ouvrir : page 1 score, page 2 recommandations.\nSi le temps le permet : mode « question par question ».\nPLAN B : touche D, séquence rejouée.",
+ "Une dernière chose. J'ai appliqué la grille Pentascore à mon propre stage : cadrage 85, sources 80, qualité logicielle 75, incidents 85, validation terrain 25. Résultat : 70 %, Moyen. Comme pour une PME, le domaine le plus faible dicte la priorité : je n'ai testé qu'avec trois profils fictifs.\n[Flèche : priorités] Valider avec des PME pilotes, déployer en ligne, migrer vers FastAPI, React et PostgreSQL. Cette auto-évaluation est subjective, exactement comme celle d'une PME : c'est pourquoi la validation externe passe en premier.",
+ "Merci de votre attention. Je suis prêt pour vos questions."
+];
+
+/* =====================  OUTILS  ===================== */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+var SVGNS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){var e=document.createElementNS(SVGNS,tag);for(var k in attrs){e.setAttribute(k,attrs[k])}if(parent)parent.appendChild(e);return e}
+function pt(cx,cy,r,i){var a=-Math.PI/2+i*2*Math.PI/5;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
+function pstr(pts){return pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ')}
+function level(v){return v<25?{n:'Critique',c:'#D24A2E'}:v<50?{n:'Faible',c:'#D9822B'}:v<75?{n:'Moyen',c:'#8A8A1F'}:{n:'Avancé',c:'#0A7D68'}}
+function ease(t){return 1-Math.pow(1-t,3)}
+function mean(a){return a.reduce(function(x,y){return x+y},0)/a.length}
+function pad(n){return (n<10?'0':'')+n}
+function fmt(s){s=Math.max(0,Math.floor(s));return pad(Math.floor(s/60))+':'+pad(s%60)}
+
+function logoMark(svg,stroke,fill,sw){
+  svg.innerHTML='';
+  var cx=50,cy=52,R=42,ratios=[.55,.85,.4,.7,.5];
+  var out=[],inn=[];for(var i=0;i<5;i++){out.push(pt(cx,cy,R,i));var p=pt(cx,cy,R*ratios[i],i);inn.push(p)}
+  el('polygon',{points:pstr(out),fill:'none',stroke:stroke,'stroke-width':sw||5,'stroke-linejoin':'round'},svg);
+  el('polygon',{points:pstr(inn),fill:fill,'fill-opacity':.85},svg);
+}
+
+/* =====================  RADAR  ===================== */
+function Radar(svg,o){
+  this.svg=svg;this.o=o;this.cur=o.labels.map(function(){return 0});
+  var cx=o.cx,cy=o.cy,R=o.R;svg.innerHTML='';
+  [.25,.5,.75,1].forEach(function(f){var ps=[];for(var i=0;i<5;i++)ps.push(pt(cx,cy,R*f,i));el('polygon',{points:pstr(ps),fill:'none',stroke:'rgba(16,32,47,.14)','stroke-width':1},svg)});
+  for(var i=0;i<5;i++){var p=pt(cx,cy,R,i);el('line',{x1:cx,y1:cy,x2:p[0],y2:p[1],stroke:'rgba(16,32,47,.14)','stroke-width':1},svg)}
+  this.poly=el('polygon',{points:pstr(this.cur.map(function(v,i){return pt(cx,cy,0,i)})),fill:o.color||'#0A7D68','fill-opacity':.16,stroke:o.color||'#0A7D68','stroke-width':2.5,'stroke-linejoin':'round'},svg);
+  this.halo=el('circle',{cx:cx,cy:cy,r:10,fill:'none',stroke:'#D24A2E','stroke-width':2.5,'class':'halo'},svg);
+  this.dots=[];this.labs=[];this.vals=[];
+  for(var j=0;j<5;j++){
+    this.dots.push(el('circle',{cx:cx,cy:cy,r:5,fill:o.color||'#0A7D68'},svg));
+    var lp=pt(cx,cy,R+o.lab,j),c=Math.cos(-Math.PI/2+j*2*Math.PI/5);
+    var anchor=c>.3?'start':c<-.3?'end':'middle';
+    var lines=o.labels[j].split('|');
+    var t=el('text',{x:lp[0],y:lp[1]-(lines.length-1)*9+(j===0?-6:0)+(j>=2&&j<=3?10:0),'text-anchor':anchor,'font-family':"Inter,sans-serif",'font-size':o.fs||17,fill:'#10202F'},svg);
+    lines.forEach(function(L,k){var ts=el('tspan',{x:lp[0],dy:k===0?0:(o.fs||17)+3},t);ts.textContent=L});
+    var vt=el('tspan',{x:lp[0],dy:(o.fs||17)+8,'font-family':"'IBM Plex Mono',monospace",'font-weight':600,'font-size':(o.fs||17)+1,fill:'#0A7D68'},t);
+    this.labs.push(t);this.vals.push(vt);
+  }
+}
+Radar.prototype.set=function(v){
+  var o=this.o,self=this;this.cur=v.slice();
+  var ps=v.map(function(x,i){return pt(o.cx,o.cy,o.R*x/100,i)});
+  this.poly.setAttribute('points',pstr(ps));
+  var wi=0;v.forEach(function(x,i){if(x<v[wi])wi=i;
+    self.dots[i].setAttribute('cx',ps[i][0]);self.dots[i].setAttribute('cy',ps[i][1]);
+    var L=level(x);self.vals[i].textContent=Math.round(x);self.vals[i].setAttribute('fill',L.c)});
+  this.halo.setAttribute('cx',ps[wi][0]);this.halo.setAttribute('cy',ps[wi][1]);
+  this.halo.style.display=(this.o.halo===false||Math.min.apply(null,v)<=0)?'none':'';
+  return wi;
+};
+Radar.prototype.animate=function(target,dur,delay){
+  var self=this,from=this.cur.slice();
+  if(this._raf)cancelAnimationFrame(this._raf);
+  var go=function(){var t0=performance.now();
+    (function step(now){var p=Math.min(1,(now-t0)/dur),e=ease(p);
+      self.set(from.map(function(f,i){return f+(target[i]-f)*e}));
+      if(p<1)self._raf=requestAnimationFrame(step)})(t0)};
+  if(delay)setTimeout(go,delay);else go();
+};
+
+/* =====================  COMPTEURS  ===================== */
+function countTo(node,to,dur,from){
+  if(node._raf)cancelAnimationFrame(node._raf);
+  var t0=performance.now(),f=from||0;
+  (function step(now){var p=Math.min(1,(now-t0)/dur);node.textContent=Math.round(f+(to-f)*ease(p));
+    if(p<1)node._raf=requestAnimationFrame(step)})(t0);
+}
+
+/* =====================  CONSTRUCTION  ===================== */
+var stage=$('#stage'),slides=$$('.slide'),N=slides.length;
+var cur=0,step=0,t0=null,slideStart=Date.now(),hudOn=false;
+
+// matrice 100 points
+(function(){var d=$('#dots');for(var i=0;i<100;i++){var e=document.createElement('div');e.className='dot'+(i<60?' hi':'');e.style.setProperty('--i',i);d.appendChild(e)}})();
+
+// couverture : pentagone à compléter
+(function(){var svg=$('#coverPent'),cx=260,cy=290,R=215;
+  var ps=[];for(var i=0;i<5;i++)ps.push(pt(cx,cy,R,i));
+  el('polygon',{points:pstr(ps),fill:'none',stroke:'#10202F','stroke-width':2,'stroke-linejoin':'round',pathLength:1,'class':'draw'},svg);
+  [.5,.25].forEach(function(f){var q=[];for(var i=0;i<5;i++)q.push(pt(cx,cy,R*f,i));el('polygon',{points:pstr(q),fill:'none',stroke:'rgba(16,32,47,.12)','stroke-width':1},svg)});
+  for(var j=0;j<5;j++){var c=el('circle',{cx:ps[j][0],cy:ps[j][1],r:11,fill:'#FAF8F2',stroke:'#10202F','stroke-width':2,'class':'cv'},svg);c.style.setProperty('--i',j)}
+})();
+
+// méthode : pentagone des domaines
+(function(){var svg=$('#domPent'),cx=400,cy=300,R=175;
+  var ps=[];for(var i=0;i<5;i++)ps.push(pt(cx,cy,R,i));
+  [.33,.66].forEach(function(f){var q=[];for(var i=0;i<5;i++)q.push(pt(cx,cy,R*f,i));el('polygon',{points:pstr(q),fill:'none',stroke:'rgba(16,32,47,.12)','stroke-width':1},svg)});
+  for(var s=0;s<5;s++)el('line',{x1:cx,y1:cy,x2:ps[s][0],y2:ps[s][1],stroke:'rgba(16,32,47,.12)','stroke-width':1},svg);
+  el('polygon',{points:pstr(ps),fill:'none',stroke:'#10202F','stroke-width':2.5,'stroke-linejoin':'round',pathLength:1,'class':'draw'},svg);
+  var ratios=[.55,.85,.4,.7,.5],inn=ratios.map(function(r,i){return pt(cx,cy,R*r,i)});
+  el('polygon',{points:pstr(inn),fill:'#0A7D68','fill-opacity':.85,'class':'inner-shape'},svg);
+  for(var j=0;j<5;j++){
+    var v=el('circle',{cx:ps[j][0],cy:ps[j][1],r:12,fill:'#0A7D68','class':'pv'},svg);v.style.setProperty('--i',j);
+    var c=Math.cos(-Math.PI/2+j*2*Math.PI/5),anchor=c>.3?'start':c<-.3?'end':'middle';
+    var lp=pt(cx,cy,R+34,j),lines=DOMAINS[j].split('|');
+    var t=el('text',{x:lp[0],y:lp[1]+(j===0?-30:(j>=2&&j<=3?14:-4)),'text-anchor':anchor,'font-family':"Fraunces,serif",'font-weight':500,'font-size':26,fill:'#10202F','class':'pl'},svg);
+    t.style.setProperty('--i',j);
+    lines.forEach(function(L,k){var ts=el('tspan',{x:lp[0],dy:k===0?0:30},t);ts.textContent=L});
+    var d=el('tspan',{x:lp[0],dy:24,'font-family':"'IBM Plex Mono',monospace",'font-size':14,fill:'rgba(16,32,47,.5)'},t);d.textContent=DESC[j];
+  }
+})();
+
+logoMark($('#nmLogo'),'#10202F','#0A7D68');
+logoMark($('#appLogo'),'#10202F','#0A7D68');
+logoMark($('#thxLogo'),'#10202F','#0A7D68',3);
+
+// HUD pentagone de chapitres
+var hudPent=$('#hudPent');
+(function(){var cx=28,cy=30,R=21;hudPent._v=[];hudPent._e=[];
+  var ps=[];for(var i=0;i<5;i++)ps.push(pt(cx,cy,R,i));
+  for(var e=0;e<5;e++){var a=ps[e],b=ps[(e+1)%5];hudPent._e.push(el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'rgba(16,32,47,.2)','stroke-width':1.5,'stroke-linecap':'round'},hudPent))}
+  for(var j=0;j<5;j++)hudPent._v.push(el('circle',{cx:ps[j][0],cy:ps[j][1],r:4,fill:'#FAF8F2',stroke:'rgba(16,32,47,.35)','stroke-width':1.5},hudPent));
+})();
+function updateHud(ch){
+  $('#hudCh').style.opacity=ch<0?0:1;
+  if(ch<0)return;
+  hudPent._v.forEach(function(c,i){var on=i<=ch;c.setAttribute('fill',on?'#0A7D68':'#FAF8F2');c.setAttribute('stroke',on?'#0A7D68':'rgba(16,32,47,.35)');c.setAttribute('r',i===ch?5.5:4)});
+  hudPent._e.forEach(function(l,i){var on=(i+1)<=ch||(i===4&&ch===4);l.setAttribute('stroke',on?'#0A7D68':'rgba(16,32,47,.2)')});
+  $('#hudLabel').textContent=pad(ch+1)+' · '+CHAPTERS[ch];
+}
+
+// radar maquette + lignes domaines
+var radar1=new Radar($('#radar1'),{cx:262,cy:205,R:130,lab:30,labels:['Gouvernance','Accès &|Identités','Infra.|& Réseau','Incidents|& Continuité','Sensibilisation'],fs:15});
+var curProfile='finance';
+(function(){var r=$('#rows');DOM_ROWS.forEach(function(n,i){r.insertAdjacentHTML('beforeend','<div class="drow"><div class="n">'+n+'</div><div class="b"><i id="rb'+i+'"></i></div><div class="s" id="rs'+i+'">0</div><div class="l" id="rl'+i+'"></div></div>')})})();
+function setRows(v){v.forEach(function(x,i){var L=level(x);var b=$('#rb'+i);b.style.width=x+'%';b.style.background=L.c;$('#rs'+i).textContent=Math.round(x);$('#rl'+i).textContent=L.n;$('#rl'+i).style.color=L.c})}
+var scoreNode=$('#rScore');
+function showProfile(key,animate,fromZero){
+  curProfile=key;var P=PROFILES[key],g=Math.round(mean(P.scores)),L=level(g);
+  $$('.pbtn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-p')===key)});
+  $('#rOrg').textContent=P.org;
+  var from=fromZero?0:parseInt(scoreNode.textContent,10)||0;
+  if(animate){countTo(scoreNode,g,900,from);radar1.animate(P.scores,900,fromZero?500:0)}else{scoreNode.textContent=g;radar1.set(P.scores)}
+  var lv=$('#rLevel');lv.textContent=L.n;lv.style.color=L.c;scoreNode.style.color=L.c;
+  var wi=P.scores.indexOf(Math.min.apply(null,P.scores));
+  $('#rSum').textContent=P.scores[wi]<60?('Point le plus faible\u00a0: '+DOM_ROWS[wi].toLowerCase()+' ('+P.scores[wi]+'\u00a0%). Les actions ci-dessous le ciblent en priorité.'):('Aucun domaine en alerte. Le plus bas\u00a0: '+DOM_ROWS[wi].toLowerCase()+' ('+P.scores[wi]+'\u00a0%). Pistes d\'optimisation uniquement.');
+  setRows(P.scores);
+  var list=$('#recs');list.classList.add('swap');
+  setTimeout(function(){list.innerHTML=P.recs.map(function(r){return '<div class="pr" style="border-color:'+SEV_COLOR[r[0]]+'"><div class="sv" style="color:'+SEV_COLOR[r[0]]+'">'+r[0]+'</div><div class="tt">'+r[1]+'</div><div class="dm">'+r[2]+'</div></div>'}).join('');list.classList.remove('swap')},animate?250:0);
+}
+$$('.pbtn').forEach(function(b){b.addEventListener('mousedown',function(e){e.preventDefault()});b.addEventListener('click',function(){showProfile(b.getAttribute('data-p'),true)})});
+
+// radar bilan
+var radar2=new Radar($('#radar2'),{cx:350,cy:300,R:215,lab:36,labels:PROJECT_SELF.labels,fs:21,color:'#0A7D68'});
+function showSelf(animate){
+  var sc=PROJECT_SELF.scores,g=Math.round(mean(sc)),L=level(g);
+  if(animate){radar2.animate(sc,1100,500);countTo($('#selfScore'),g,1200)}else{radar2.set(sc);$('#selfScore').textContent=g}
+  var lv=$('#selfLevel');lv.textContent=L.n;lv.style.color=L.c;$('#selfScore').style.color=L.c;
+}
+
+/* ---------- plan B ---------- */
+var pbRadar=new Radar($('#pbRadar'),{cx:262,cy:205,R:120,lab:34,labels:['Gouvernance','Accès &|Identités','Infra.|& Réseau','Incidents|& Continuité','Sensibilisation'],fs:15});
+pbRadar.set(PROFILES.finance.scores);
+(function(){var h='';DOM_ROWS.forEach(function(n,i){var v=PROFILES.finance.scores[i],L=level(v);h+='<div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(16,32,47,.1)"><span>'+n+'</span><b class="mono" style="color:'+L.c+'">'+v+'%</b></div>'});$('#pbRows').innerHTML=h})();
+var pbTimer=null,pbIdx=0;
+function pbShow(i){$$('.pbv').forEach(function(v,k){v.classList.toggle('on',k===i)})}
+function togglePlanB(force){
+  var pb=$('#planB'),on=force===undefined?!pb.classList.contains('on'):force;
+  pb.classList.toggle('on',on);
+  if(pbTimer){clearInterval(pbTimer);pbTimer=null}
+  if(on){pbIdx=0;pbShow(0);pbTimer=setInterval(function(){pbIdx=(pbIdx+1)%4;pbShow(pbIdx)},3400)}
+}
+
+/* =====================  NAVIGATION  ===================== */
+function maxStep(i){return parseInt(slides[i].getAttribute('data-steps')||'0',10)}
+function applyStep(){var s=slides[cur];s.classList.remove('s1','s2','s3');for(var k=1;k<=step;k++)s.classList.add('s'+k);drawDots()}
+function drawDots(){var m=maxStep(cur),h='';for(var k=1;k<=m;k++)h+='<span class="sd'+(k<=step?' on':'')+'"></span>';$('#stepDots').innerHTML=h}
+function onEnter(i){
+  var s=slides[i];
+  $$('.count',s).forEach(function(c){countTo(c,parseInt(c.getAttribute('data-to'),10),i===1?1500:1700)});
+  if(i===6){showProfile(curProfile,true,true)}
+  if(i===8){showSelf(true)}
+}
+function goTo(i,st){
+  if(i<0||i>=N)return;
+  slides[cur].classList.remove('active','s1','s2','s3');
+  cur=i;step=st||0;slides[cur].classList.add('active');
+  if(cur>0&&t0===null)t0=Date.now();
+  slideStart=Date.now();
+  $('#cnt').textContent=pad(cur+1)+' / '+N;
+  $('#progFill').style.width=((cur)/(N-1)*100)+'%';
+  updateHud(parseInt(slides[cur].getAttribute('data-chapter'),10));
+  applyStep();onEnter(cur);
+  $('#notesH').textContent='Notes · diapositive '+(cur+1)+' / '+N+' · objectif '+(slides[cur].getAttribute('data-budget')||0)+' s';
+  $('#notesT').innerHTML=NOTES[cur].replace(/\n/g,'<br>');
+}
+function next(){if(step<maxStep(cur)){step++;applyStep();return}if(cur<N-1)goTo(cur+1,0)}
+function prev(){if(step>0){step--;applyStep();return}if(cur>0)goTo(cur-1,maxStep(cur-1))}
+
+function tick(){
+  if(!hudOn)return;
+  var tot=t0===null?0:(Date.now()-t0)/1000,sl=(Date.now()-slideStart)/1000,b=parseInt(slides[cur].getAttribute('data-budget')||'0',10);
+  $('#tTotal').textContent=fmt(tot);
+  $('#tSlide').textContent=b?(fmt(sl)+' / '+fmt(b)):'';
+  var h=$('#hudTimer');h.classList.toggle('warn',tot>=540&&tot<600);h.classList.toggle('over',tot>=600);
+}
+setInterval(tick,250);
+
+function fit(){var s=Math.min(window.innerWidth/1600,window.innerHeight/900);stage.style.setProperty('--s',s)}
+window.addEventListener('resize',fit);fit();
+
+window.addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  var k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();if($('#planB').classList.contains('on'))return;next()}
+  else if(k==='ArrowLeft'||k==='PageUp'||k==='Backspace'){e.preventDefault();if($('#planB').classList.contains('on'))return;prev()}
+  else if(k==='Home'){goTo(0,0)}else if(k==='End'){goTo(N-1,0)}
+  else if(k==='t'||k==='T'){hudOn=!hudOn;$('#hudTimer').classList.toggle('on',hudOn);tick()}
+  else if(k==='n'||k==='N'){$('#notes').classList.toggle('on')}
+  else if(k==='d'||k==='D'){togglePlanB()}
+  else if(k==='h'||k==='H'||k==='?'){$('#help').classList.toggle('on')}
+  else if(k==='r'||k==='R'){t0=cur>0?Date.now():null;slideStart=Date.now();tick()}
+  else if(k==='f'||k==='F'){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}else{document.exitFullscreen&&document.exitFullscreen()}}
+  else if(k==='Escape'){$('#notes').classList.remove('on');$('#help').classList.remove('on');togglePlanB(false)}
+  else if(cur===6&&(k==='1'||k==='2'||k==='3')){showProfile(['finance','commerce','techno'][parseInt(k,10)-1],true)}
+});
+stage.addEventListener('click',function(e){
+  if(e.target.closest('[data-ui]')||$('#planB').classList.contains('on')||$('#notes').classList.contains('on')||$('#help').classList.contains('on'))return;
+  next();
+});
+
+/* =====================  INIT / IMPRESSION  ===================== */
+showProfile('finance',false);showSelf(false);
+if(PRINT){
+  document.body.classList.add('print');
+  slides.forEach(function(s){s.classList.add('active','s1','s2','s3')});
+  $$('.count').forEach(function(c){c.textContent=c.getAttribute('data-to')});
+  document.documentElement.style.overflow='visible';
+}else{
+  goTo(0,0);
+}
+window.__deck={goTo:goTo,next:next,prev:prev,showProfile:showProfile,togglePlanB:togglePlanB,state:function(){return {cur:cur,step:step}}};
+})();
+</script>
+</body>
+</html>
