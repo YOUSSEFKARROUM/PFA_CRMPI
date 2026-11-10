@@ -12,7 +12,7 @@ Ce chapitre détaille la démarche de conception de la plateforme, l'architectur
 \section{Méthodologie et démarche}
 \label{sec:methodologie}
 
-\hspace{1cm}Le projet a été mené selon une démarche itérative en trois jalons, conforme au planning présenté au chapitre~\ref{chap:contexte} (section~\ref{sec:planification}). Chaque jalon a fait l'objet de points de contrôle hebdomadaires avec l'encadrant professionnel, le Dr.~Rachid Abouettahir, ainsi que d'un rapport de progression écrit en fin de jalon. Les trois rapports de progression produits (Jalon~1, Jalon~2, Jalon~3) documentent l'avancement jour par jour et ont été intégralement transmis et validés par l'encadrant.
+\hspace{1cm}Le projet a été mené selon une démarche itérative en trois jalons, conforme au planning présenté au chapitre~\ref{chap:contexte} (section~\ref{sec:planification}). Chaque jalon a fait l'objet de points de contrôle hebdomadaires avec l'encadrant professionnel, le Dr.~Rachid Abouettahir, ainsi que d'un rapport de progression écrit en fin de jalon. Les trois rapports de progression produits (Jalon~1, Jalon~2, Jalon~3) documentent l'avancement jour par jour et ont été intégralement transmis et validés par l'encadrant. Le prototype ainsi validé, développé avec Streamlit, a ensuite été reconstruit dans un quatrième jalon en application finale, \textbf{Pentascore}, décrite dans la suite de ce chapitre.
 
 % -------------------------------------------------------
 \section{Architecture du système}
@@ -20,72 +20,41 @@ Ce chapitre détaille la démarche de conception de la plateforme, l'architectur
 
 \subsection{Vue d'ensemble}
 
-La figure~\ref{fig:architecture} illustre l'architecture globale retenue pour le \gls{mvp} de la plateforme.
+L'architecture a évolué en deux temps. Le prototype reposait sur un seul processus Streamlit, qui servait l'interface et exécutait la logique métier. L'application finale sépare l'interface, l'\gls{api} et le moteur métier (figure~\ref{fig:architecture}), tout en restant servie par un seul processus.
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
-    node distance=1.2cm and 1.8cm,
-    block/.style={
-      rectangle, draw=iacsTeal, fill=iacsLight!50,
-      rounded corners=5pt, minimum width=3.2cm,
-      minimum height=1.2cm, align=center,
-      font=\small\sffamily, line width=0.8pt,
-      drop shadow={shadow xshift=1pt, shadow yshift=-1pt, opacity=0.1}
-    },
-    dbblock/.style={
-      cylinder, draw=iacsTeal, fill=iacsGreen!15,
-      shape border rotate=90, aspect=0.25,
-      minimum width=2.2cm, minimum height=1.2cm,
-      font=\small\sffamily, line width=0.8pt,
-      align=center, cylinder uses custom fill,
-      cylinder body fill=iacsGreen!15, cylinder end fill=iacsGreen!25
-    },
-    pdfblock/.style={
-      block, fill=iacsOrange!15, draw=iacsOrange
-    },
-    arrow/.style={-Stealth, thick, color=iacsTeal},
-    dataarrow/.style={-Stealth, thick, color=iacsAccent, dashed}
+    node distance=0.9cm,
+    block/.style={rectangle, draw=iacsTeal, fill=iacsLight!50, rounded corners=5pt,
+      minimum width=3cm, minimum height=1.5cm, align=center, font=\small\sffamily, line width=0.8pt},
+    core/.style={block, fill=iacsGreen!15, draw=iacsGreen!60!black, line width=1.2pt},
+    dbblock/.style={cylinder, draw=iacsTeal, fill=iacsGreen!15, shape border rotate=90, aspect=0.25,
+      minimum width=2.4cm, minimum height=1.4cm, font=\small\sffamily, line width=0.8pt, align=center},
+    outblock/.style={block, fill=iacsOrange!15, draw=iacsOrange, minimum width=2.6cm, minimum height=1cm},
+    arrow/.style={-Stealth, thick, color=iacsTeal}
   ]
-    % Couche interface
-    \node[block] (ui) {\faDesktop\; Interface\\Streamlit};
-    \node[block, right=of ui] (quest) {Questionnaire\\25 questions};
-    \node[block, right=of quest] (score) {\textbf{Moteur de}\\\textbf{scoring}};
-
-    % Couche données
-    \node[dbblock, below=2.1cm of quest] (db) {SQLite\\7 tables};
-
-    % Couche restitution
-    \node[block, below=2.1cm of ui] (reco) {Recommandations\\priorisées};
-    \node[pdfblock, below=2.1cm of score] (pdf) {\faFilePdf\; Export\\ReportLab};
-
-    % Flèches
-    \draw[arrow] (ui) -- (quest);
-    \draw[arrow] (quest) -- (score);
-    \draw[dataarrow] (quest) -- (db);
-    \draw[dataarrow] (score) -- (db);
-    \draw[arrow] (score) -- (pdf);
-    \draw[arrow] (score) -- (reco);
-    \draw[dataarrow] (reco) -- (pdf);
-
-    % Labels couches
-    \node[font=\footnotesize\sffamily\bfseries\color{iacsTeal},
-          anchor=west] at ([xshift=-1cm, yshift=0.9cm]ui.north)
-          {\faLayerGroup\; Couche interface};
-    \node[font=\footnotesize\sffamily\bfseries\color{iacsGreen!60!black},
-          anchor=west] at ([xshift=-1cm, yshift=1.6cm]db.north)
-          {\faDatabase\; Couche données};
-    \node[font=\footnotesize\sffamily\bfseries\color{iacsOrange},
-          anchor=west] at ([xshift=-1cm, yshift=0.9cm]reco.north)
-          {\faFile\; Couche restitution};
+    \node[block] (ui) {\faDesktop\; Interface\\React + TypeScript};
+    \node[block, right=of ui] (api) {\gls{api} FastAPI\\recalcule le score};
+    \node[core, right=of api] (eng) {\textbf{Moteur Python}\\score, priorités,\\cohérence};
+    \node[dbblock, right=of eng] (db) {SQLite\\7 tables};
+    \node[outblock, below=1cm of eng, xshift=-1.6cm] (pdf) {\faFilePdf\; Rapport PDF};
+    \node[outblock, below=1cm of eng, xshift=1.6cm] (badge) {\faImage\; Badge PNG};
+    \draw[arrow, <->] (ui) -- node[above, font=\scriptsize\sffamily] {JSON} (api);
+    \draw[arrow] (api) -- (eng);
+    \draw[arrow, <->] (eng) -- (db);
+    \draw[arrow] (eng) -- (pdf);
+    \draw[arrow] (eng) -- (badge);
   \end{tikzpicture}
-  \caption{Architecture globale de la plateforme d'auto-évaluation}
+  \caption{Architecture de l'application finale Pentascore}
   \label{fig:architecture}
 \end{figure}
 
+Le calcul du score n'existe qu'à un seul endroit, le module \texttt{src/scoring.py}. L'interface envoie les réponses brutes ; le serveur recalcule toujours le score, les priorités, le rapport \gls{pdf} et l'historique. Un score modifié dans le navigateur n'a donc aucun effet.
+
 \subsection{Stack technique retenue}
 
-Le tableau~\ref{tab:technologies} résume les technologies et outils retenus pour le développement du \gls{mvp}.
+Le tableau~\ref{tab:technologies} résume les technologies de l'application finale.
 
 \begin{table}[H]
   \centering
@@ -99,63 +68,61 @@ Le tableau~\ref{tab:technologies} résume les technologies et outils retenus pou
     \textcolor{white}{\textbf{Outil}} &
     \textcolor{white}{\textbf{Rôle}} \\
     \hline
-    Frontend/Backend & Streamlit (Python) & Framework unique pour le prototypage rapide de l'interface \\
+    Interface & React, TypeScript, Vite & Parcours, questionnaire, résultats animés, historique \\
     \hline
     \rowcolor{iacsLightGray}
-    Base de données & SQLite & Persistance des \gls{pme}, audits, réponses et recommandations \\
+    \gls{api} & FastAPI (Python) & Routes JSON, sessions, limitation de débit, service de l'interface compilée \\
     \hline
-    Génération PDF & ReportLab~\cite{reportlab} & Génération du rapport de résultats exportable \\
+    Moteur métier & Python (\texttt{src/}) & Score, recommandations, cohérence, rapport \gls{pdf}, badge \\
     \hline
     \rowcolor{iacsLightGray}
-    Authentification & bcrypt & Hachage des mots de passe (module développé, non intégré au flux principal) \\
+    Base de données & SQLite & Questions, 47 recommandations, comptes et évaluations \\
     \hline
-    Tests & pytest, \texttt{streamlit.testing.v1.AppTest} & Tests unitaires et tests de bout en bout sans navigateur \\
+    Génération & ReportLab~\cite{reportlab}, Pillow & Rapport \gls{pdf} de 3 pages avec QR code ; badge PNG \\
+    \hline
+    \rowcolor{iacsLightGray}
+    Sécurité & bcrypt, cookie HttpOnly & Mots de passe hachés, session \texttt{SameSite=Strict} \\
+    \hline
+    Tests & pytest, Vitest, Playwright & Tests serveur, tests d'interface, parcours de bout en bout \\
     \hline
   \end{tabularx}
 \end{table}
 
 \subsection{Justification des choix technologiques}
 
-\textbf{Streamlit plutôt que Django/Flask+React.} Le choix de Streamlit~\cite{streamlit} répond à un besoin de rapidité de prototypage pour un \gls{mvp} à interface relativement simple. Ce framework unique évite la séparation frontend/backend, ce qui réduit la complexité d'intégration et permet une boucle de développement courte, adaptée à un stage de sept semaines.
+\textbf{Streamlit d'abord, pour valider vite.} Streamlit~\cite{streamlit} a permis de construire en quelques jours un prototype complet, sans séparer interface et serveur. C'était le bon outil pour valider le questionnaire, la formule et les priorités avec l'encadrant.
 
-\textbf{SQLite plutôt que PostgreSQL.} SQLite ne nécessite aucune infrastructure serveur dédiée et se révèle suffisant pour le volume d'usage visé, chaque audit étant réalisé par un utilisateur unique. La migration vers PostgreSQL est documentée comme perspective d'évolution (voir section~\ref{sec:perspectives}).
+\textbf{React et FastAPI ensuite, pour l'application finale.} Une fois la méthode validée, Streamlit montrait ses limites : peu de contrôle sur l'interface, rechargement complet à chaque clic, et une logique métier mêlée à l'affichage. La séparation React / FastAPI apporte une interface plus claire pour un dirigeant non technique, une \gls{api} qui reste la seule source de vérité pour le score, et un moteur métier testable seul.
 
-\textbf{ReportLab pour l'export PDF.} ReportLab permet une génération de \gls{pdf} en Python pur, avec un contrôle fin de la mise en page (jauge vectorielle, graphique en barres, tableaux), sans dépendance à un service externe.
+\textbf{SQLite plutôt que PostgreSQL.} SQLite tient dans un seul fichier, sans serveur à installer, et suffit pour une instance unique. Le passage à PostgreSQL pour un déploiement en ligne ne change pas le moteur (voir section~\ref{sec:perspectives}).
+
+\textbf{Tout en local, hors ligne.} Les réponses d'une \gls{pme} décrivent ses failles : elles ne doivent partir vers aucun service tiers. Les polices sont embarquées, la politique de sécurité du contenu (CSP) est limitée à l'origine de l'application, et un test de bout en bout vérifie qu'aucune requête ne sort vers un domaine extérieur.
 
 \subsection{Structure des fichiers}
 \label{sec:structure_fichiers}
 
-L'application suit une architecture monolithique simple, volontairement choisie pour un \gls{mvp} développé en sept semaines : un seul processus Streamlit sert l'interface et exécute la logique métier, avec une base SQLite locale. Les modules \texttt{scoring.py} et \texttt{questionnaire.py} sont volontairement indépendants de Streamlit (aucun \texttt{import streamlit}), ce qui permet de les tester unitairement en isolation totale, sans lancer l'application. L'arborescence du dépôt est la suivante :
+Le moteur métier (\texttt{src/}) ne dépend ni de l'interface ni de l'\gls{api} : il est réutilisé tel quel par FastAPI et testé en isolation. L'arborescence du dépôt est la suivante :
 
 \begin{lstlisting}[language=bash, caption={Structure des fichiers du dépôt}, label={lst:structure}, basicstyle=\ttfamily\footnotesize\color{iacsDark}, frame=l]
 cmrpi-platform/
-|-- app.py                    # Application Streamlit (point d'entree)
-|-- requirements.txt          # Dependances d'execution
-|-- requirements-dev.txt      # Dependances de developpement (tests, lint)
-|-- setup.cfg                 # Configuration flake8
-|-- .github/workflows/ci.yml  # Integration continue
-|
+|-- api/                      # API FastAPI (routes, securite)
+|-- frontend/                 # React + Vite + TypeScript
+|   |-- src/components/       # ecrans du parcours
+|   |-- src/state/            # logique du parcours (pure, testee)
+|   `-- e2e/                  # parcours de bout en bout (Playwright)
 |-- src/
-|   |-- auth.py               # Authentification (bcrypt)
-|   |-- database.py           # Acces SQLite (CRUD)
-|   |-- scoring.py            # Moteur de calcul du score
-|   |-- questionnaire.py      # Chargement et validation du questionnaire
-|   |-- pdf_generator.py      # Generation du rapport PDF
-|   |-- ui_components.py      # Systeme de design (CSS, SVG)
-|   `-- test_profiles.py      # 3 profils fictifs de demonstration
-|
-|-- data/
-|   |-- questions/            # questions_fr.json, questions_en.json, guidance.json
-|   |-- recommendations/      # Recommendations_Database.xlsx
-|   `-- schema.sql            # Schema de la base de donnees
-|
-|-- scripts/
-|   `-- init_db.py            # Initialisation de app.db
-|
-|-- tests/                    # 52 tests (unitaires + bout en bout)
-|
-`-- docs/
-    `-- Scoring_Rules_V1.md   # Methodologie de scoring detaillee
+|   |-- scoring.py            # Score, priorites, points perdus
+|   |-- consistency_checker.py# 30 regles de coherence
+|   |-- pdf_generator.py      # Rapport PDF (page 1, QR code)
+|   |-- pdf_annex.py          # Pages 2 et 3 du rapport
+|   |-- badge_generator.py    # Badge PNG partageable
+|   |-- templates.py          # Fiche de poste RSSI junior
+|   |-- auth.py, database.py  # Comptes (bcrypt), acces SQLite
+|   `-- questionnaire.py, test_profiles.py
+|-- data/                     # questions, regles, schema SQL
+|-- tests/                    # 285 tests (pytest)
+|-- docs/                     # Scoring_Rules_V1.md, presentation
+`-- .github/workflows/ci.yml  # Integration continue
 \end{lstlisting}
 
 % -------------------------------------------------------
@@ -371,66 +338,131 @@ Huit diagrammes UML ont été produits au Jalon~1 (Mermaid.js) afin de formalise
 
 \subsection{Interface applicative}
 
-L'interface développée sous Streamlit comprend trois écrans principaux : l'accueil (avec sélection du mode d'affichage), le questionnaire et les résultats.
+L'interface finale guide le dirigeant en quatre temps : l'accueil, une courte préparation, le questionnaire et le résultat (figure~\ref{fig:screenshots}). Elle suit une direction graphique sobre, dite \enquote{relevé de précision}, dont le pentagone des cinq domaines est la signature.
 
-\iacsnote{Le cahier des charges de l'encadrant spécifiait \enquote{une question par écran \textbf{ou} par section}. Plutôt que de n'implémenter qu'une seule de ces deux options, un sélecteur a été ajouté afin de proposer les deux modes au choix de l'utilisateur : cinq écrans de cinq questions chacun, ou vingt-cinq écrans d'une question chacun. Ce choix illustre une lecture attentive du cahier des charges, en couvrant l'ensemble des options proposées plutôt qu'un sous-ensemble.}
-
-Le système de design retenu s'appuie sur la palette de couleurs du \gls{cmrpi} (navy \texttt{\#14213D}, teal \texttt{\#0E7C7B}, sable \texttt{\#C9A46A}) et sur les typographies Space Grotesk, Inter et JetBrains Mono. Un graphique radar \gls{svg} sur mesure a été développé pour visualiser les cinq scores de domaine, ce choix étant jugé plus pertinent qu'un simple graphique en barres pour une évaluation structurée en cinq axes.
+\iacsnote{Le cahier des charges de l'encadrant spécifiait \enquote{une question par écran \textbf{ou} par section}. Les deux modes sont proposés au choix : cinq écrans de cinq questions, ou vingt-cinq écrans d'une question.}
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.31\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \fbox{\includegraphics[width=\linewidth]{figures/01_accueil.jpg}}
-    \caption{Accueil et sélection du mode}
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_accueil.jpg}}
+    \caption{Accueil}
     \label{fig:screen_home}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.31\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \fbox{\includegraphics[width=\linewidth]{figures/02_questionnaire_section.jpg}}
-    \caption{Questionnaire (mode section)}
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_preparation.jpg}}
+    \caption{Préparation et profils de démonstration}
+    \label{fig:screen_prep}
+  \end{subfigure}
+  \\[8pt]
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_questionnaire.jpg}}
+    \caption{Questionnaire}
     \label{fig:screen_questionnaire}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.31\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \fbox{\includegraphics[width=\linewidth]{figures/03_resultats.jpg}}
-    \caption{Résultats avec radar chart}
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_after.jpg}}
+    \caption{Résultat : score, niveau, radar}
     \label{fig:screen_results}
   \end{subfigure}
-  \caption{Captures d'écran des trois étapes du parcours utilisateur (profil \enquote{PME Finance Test})}
+  \caption{Parcours utilisateur de l'application finale}
   \label{fig:screenshots}
 \end{figure}
 
-L'écran d'accueil (figure~\ref{fig:screen_home}) permet de renseigner facultativement le nom de l'organisation et son secteur, de choisir le mode d'affichage du questionnaire, et de charger instantanément un profil de démonstration. L'écran de questionnaire (figure~\ref{fig:screen_questionnaire}) illustre le mode \enquote{section}, ici pour le domaine Accès~\&~Identités : chaque question affiche son texte, un texte de guidance contextualisé et cinq options de réponse sous forme de cartes sélectionnables, avec un indicateur en pastilles matérialisant la progression à travers les cinq domaines. L'écran de résultats (figure~\ref{fig:screen_results}) affiche la jauge de score global colorée selon le niveau de maturité, le radar chart des cinq scores de domaine, ainsi que le détail par domaine. Dans les deux modes de questionnaire, le bouton \enquote{Suivant} reste désactivé tant que la section ou la question en cours n'a pas de réponse.
+L'accueil (figure~\ref{fig:screen_home}) présente la démarche et ses limites. La préparation (figure~\ref{fig:screen_prep}) demande deux informations facultatives, le nom et le secteur, et permet de charger un profil de démonstration. Le questionnaire (figure~\ref{fig:screen_questionnaire}) affiche pour chaque question une aide contextuelle et une échelle graduée de 1 à 5, utilisable au clavier. Le résultat (figure~\ref{fig:screen_results}) révèle le score, le sceau de niveau et le radar des cinq domaines, puis les priorités.
 
-\subsection{Export PDF}
+\subsection{Comprendre son score}
 
-Le rapport de résultats généré par ReportLab (figure~\ref{fig:pdf_export}) comprend un en-tête aux couleurs du \gls{cmrpi}, un tableau d'identification de la \gls{pme}, une jauge en arc colorée selon le niveau de maturité obtenu, un graphique en barres des cinq scores de domaine, un tableau détaillé des réponses et deux à trois recommandations prioritaires accompagnées d'un badge de sévérité coloré (Critique, Haute, Moyenne, Basse).
+Deux fonctionnalités rendent le score explicable (figure~\ref{fig:explain}) :
+\begin{itemize}
+  \item \textbf{Rejouer le score.} Chaque question pèse $100 / (5 \times 5) = 4$ points ; chaque cran perdu sur l'échelle coûte donc 1 point. Le panneau affiche les réponses qui ont coûté le plus de points. La somme des points perdus vaut exactement $100 - \text{score}$, ce que vérifient les tests.
+  \item \textbf{Points à revérifier.} Une auto-évaluation peut contenir des réponses contradictoires. Trente règles déterministes, de la forme \enquote{si la question A $\geq x$, la question B devrait être $\geq y$}, les signalent. Onze règles détectent deux réponses qui se contredisent, dix-neuf un prérequis manquant. Chaque règle cite une mesure de l'ISO/IEC 27001:2022. Elles ne modifient jamais le score : elles invitent à vérifier.
+\end{itemize}
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.47\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \fbox{\includegraphics[width=\linewidth]{figures/pdf_page1.jpg}}
-    \caption{Page 1 -- score global et scores par domaine}
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_replay.jpg}}
+    \caption{Rejouer le score}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_checks.jpg}}
+    \caption{Points à revérifier}
+  \end{subfigure}
+  \caption{Rendre le score explicable}
+  \label{fig:explain}
+\end{figure}
+
+\subsection{Des priorités pilotées par les réponses}
+
+Chacune des 47 recommandations est liée à la question qu'elle corrige et à un seuil : elle n'apparaît que si la réponse est sous ce seuil. L'outil ne recommande donc jamais une pratique déjà déclarée. Chaque priorité affiche \enquote{parce que vous avez répondu\ldots}, avec au plus deux priorités par domaine. Chaque recommandation cite une double source : la section réelle du guide AUSIM-CMRPI (édition 2018) et la mesure de l'ISO/IEC 27001:2022 ; un test bloque toute référence inexistante. Enfin, si le domaine Gouvernance est sous 50, un modèle de fiche de poste de RSSI junior est proposé.
+
+\subsection{Export PDF}
+
+Le rapport \gls{pdf} compte trois pages (figure~\ref{fig:pdf_export}) : une synthèse avec le score, le radar et un QR code \enquote{Refaites votre évaluation dans 6 mois} ; un plan d'action classé par effort, avec les bons réflexes en cas d'incident ; puis les réponses déclarées, la méthodologie et les limites. Une référence calculée à partir des réponses figure en pied de page.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.31\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_pdf1.jpg}}
+    \caption{Synthèse}
     \label{fig:pdf_page1}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\textwidth}
+  \begin{subfigure}[b]{0.31\textwidth}
     \centering
-    \fbox{\includegraphics[width=\linewidth]{figures/pdf_page2.jpg}}
-    \caption{Page 2 -- recommandations prioritaires}
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_pdf2.jpg}}
+    \caption{Plan d'action}
     \label{fig:pdf_page2}
   \end{subfigure}
-  \caption{Rapport PDF exporté (profil \enquote{PME Finance Test}, score global 44,0\,\%)}
+  \hfill
+  \begin{subfigure}[b]{0.31\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_pdf3.jpg}}
+    \caption{Réponses et méthode}
+  \end{subfigure}
+  \caption{Rapport PDF de trois pages}
   \label{fig:pdf_export}
 \end{figure}
 
+\subsection{Badge, compte et historique}
+
+Le \textbf{badge} est une image PNG générée localement : score, niveau, organisation, date et pentagone. Il porte la mention \enquote{auto-évaluation déclarative -- ne vaut ni audit ni certification}, pour ne jamais passer pour une certification. Le \textbf{compte} est facultatif : sans compte, aucune réponse n'est enregistrée côté serveur. Avec un compte, le consentement explicite est horodaté, conformément à la loi 09-08, et la suppression du compte efface toutes les données. L'\textbf{historique} montre l'évolution du score d'une évaluation à l'autre (figure~\ref{fig:badge_hist}).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.38\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_badge.jpg}}
+    \caption{Badge partageable}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.58\textwidth}
+    \centering
+    \fbox{\includegraphics[width=\linewidth]{figures/v2_history.jpg}}
+    \caption{Historique des évaluations}
+  \end{subfigure}
+  \caption{Partager sa démarche et suivre ses progrès}
+  \label{fig:badge_hist}
+\end{figure}
+
+\subsection{Sécurité de l'application}
+
+Les mots de passe sont hachés avec bcrypt. La session repose sur un cookie \texttt{HttpOnly} et \texttt{SameSite=Strict}, signé par une clé secrète obligatoire en production. Les routes d'authentification et de calcul sont protégées par une limitation de débit par adresse IP. Ces protections sont couvertes par une série de tests dédiés (\texttt{test\_api\_hardening.py}).
+
 \subsection{Profils fictifs de test intégrés}
 
-Conformément à l'exigence du brief du Jalon~2 (\enquote{tester avec 2--3 profils fictifs de \gls{pme}}), les trois profils présentés au tableau~\ref{tab:profils} peuvent être chargés en un clic depuis l'écran d'accueil, via le module \texttt{src/test\_profiles.py}, afin de faciliter les démonstrations rapides de la plateforme.
+Conformément au brief du Jalon~2 (\enquote{tester avec 2--3 profils fictifs de \gls{pme}}), les trois profils du tableau~\ref{tab:profils} se chargent en un clic depuis l'écran de préparation, via le module \texttt{src/test\_profiles.py}.
 
 % -------------------------------------------------------
 \section{Référence des modules}
@@ -440,7 +472,7 @@ Conformément à l'exigence du brief du Jalon~2 (\enquote{tester avec 2--3 profi
 
 \subsection{\texttt{scoring.py} -- moteur de calcul du score}
 
-Module Python pur, sans aucune dépendance externe (ni Streamlit, ni base de données), ce qui permet de le tester et de le réutiliser indépendamment de l'interface. Le tableau~\ref{tab:mod_scoring} recense l'intégralité des neuf fonctions publiques du module, telles qu'elles figurent dans le fichier \texttt{src/scoring.py} du dépôt public à la date de rédaction de ce rapport.
+Module Python pur, sans aucune dépendance externe (ni interface, ni base de données), ce qui permet de le tester et de le réutiliser indépendamment de l'interface. Le tableau~\ref{tab:mod_scoring} recense les principales fonctions publiques du module, telles qu'elles figurent dans le fichier \texttt{src/scoring.py} du dépôt public à la date de rédaction de ce rapport.
 
 \begin{longtable}{|>{\ttfamily\raggedright\scriptsize}p{4.8cm}|p{9.2cm}|}
   \caption{Fonctions publiques de \texttt{scoring.py} (dépôt public)} \label{tab:mod_scoring} \\
@@ -521,17 +553,17 @@ Toutes les fonctions de ce module utilisent un gestionnaire de contexte \texttt{
 
 \subsection{Autres modules}
 
-Le module \texttt{auth.py} fournit le hachage et la vérification bcrypt des mots de passe, ainsi que l'inscription et l'authentification d'une \gls{pme} ; il est fonctionnel et testé, mais n'est pas branché au flux principal de l'application, l'accès direct au questionnaire sans connexion ayant été retenu pour une expérience \enquote{simple à utiliser} conforme au brief du Jalon~2. Le module \texttt{questionnaire.py} charge les 25 questions et leur guidance depuis les fichiers JSON, et expose les regroupements par domaine utilisés par le mode \enquote{section}. Le module \texttt{pdf\_generator.py} construit le rapport \gls{pdf} via sa fonction principale \texttt{generate\_\allowbreak audit\_\allowbreak report(...)}, qui reçoit désormais une liste plate de recommandations plutôt qu'un dictionnaire par domaine, conformément à \texttt{scoring.\allowbreak generate\_\allowbreak top\_\allowbreak recommendations()}. Le module \texttt{ui\_components.py} centralise le système de design (feuille de style CSS, sélecteur de mode, indicateur de progression, génération du radar chart et de la jauge en \gls{svg}). Enfin, \texttt{test\_profiles.py} définit les trois profils fictifs de démonstration et leur conversion en réponses individuelles.
+Le module \texttt{consistency\_checker.py} charge et valide les 30 règles de cohérence, puis renvoie les points à revérifier. Les modules \texttt{pdf\_generator.py} et \texttt{pdf\_annex.py} construisent les trois pages du rapport \gls{pdf}, QR code compris. \texttt{badge\_generator.py} produit le badge PNG avec Pillow, \texttt{templates.py} la fiche de poste de RSSI junior. \texttt{auth.py} gère les comptes (bcrypt) et \texttt{database.py} l'accès à SQLite. Côté \gls{api}, le dossier \texttt{api/} regroupe la configuration, la sécurité (sessions, limitation de débit) et les routes \texttt{assessment.py} et \texttt{accounts.py}. Enfin, \texttt{scoring.get\_score\_contributions()} calcule les points perdus question par question pour la fonction \enquote{rejouer le score}.
 
 % -------------------------------------------------------
 \section{Tests et validation}
 \label{sec:tests}
 
-\hspace{1cm}La qualité logicielle de la plateforme a été validée par une suite de 52 tests automatisés, atteignant 90\,\% de couverture de code (mesurée avec pytest-cov). Ces tests couvrent le moteur de scoring, l'authentification, la base de données, la génération \gls{pdf} et le questionnaire. Le tableau~\ref{tab:tests} détaille leur répartition par fichier.
+\hspace{1cm}Le score est un résultat auquel la \gls{pme} va se fier : une erreur de calcul ferait perdre toute confiance. La qualité a donc été vérifiée à trois niveaux : 285 tests côté serveur (pytest), 71 tests côté interface (Vitest) et 13 parcours de bout en bout dans un vrai navigateur (Playwright), avec 98\,\% de couverture de code côté serveur comme côté interface. Le tableau~\ref{tab:tests} détaille les tests côté serveur.
 
 \begin{table}[H]
   \centering
-  \caption{Répartition de la suite de tests}
+  \caption{Répartition des tests côté serveur}
   \label{tab:tests}
   \renewcommand{\arraystretch}{1.3}
   \small
@@ -542,74 +574,88 @@ Le module \texttt{auth.py} fournit le hachage et la vérification bcrypt des mot
     \textcolor{white}{\textbf{Tests}} &
     \textcolor{white}{\textbf{Contenu}} \\
     \hline
-    \texttt{test\_scoring.py} & 15 & Formules de score, seuils de maturité, sélection de recommandations \\
+    \texttt{test\_consistency\_checker.py} & 111 & Les 30 règles de cohérence, validation du fichier de règles \\
     \hline
     \rowcolor{iacsLightGray}
-    \texttt{test\_questionnaire.py} & 8 & Chargement JSON, validation des réponses \\
+    \texttt{test\_api\_assessment.py} & 33 & Routes de score, de rapport et d'historique \\
     \hline
-    \texttt{test\_profiles.py} & 3 & Cohérence des 3 profils de démonstration \\
-    \hline
-    \rowcolor{iacsLightGray}
-    \texttt{test\_auth.py} & 8 & Inscription, connexion, hachage des mots de passe \\
-    \hline
-    \texttt{test\_database\_pdf.py} & 6 & CRUD base de données, génération \gls{pdf} \\
+    \texttt{test\_scoring.py} & 30 & Formules, seuils, priorités, points perdus \\
     \hline
     \rowcolor{iacsLightGray}
-    \texttt{test\_app\_flow.py} & 12 & Tests de bout en bout (\texttt{AppTest}) : parcours complet, 2 modes, export \gls{pdf} \\
+    \texttt{test\_api\_hardening.py} & 22 & Sessions, limitation de débit, entrées invalides \\
     \hline
-    \textbf{Total} & \textbf{52} & \\
+    \texttt{test\_database\_pdf.py} & 21 & Base de données, rapport \gls{pdf}, QR code décodé \\
+    \hline
+    \rowcolor{iacsLightGray}
+    \texttt{test\_badge\_generator.py} & 17 & Badge PNG \\
+    \hline
+    \texttt{test\_api\_accounts.py} & 14 & Inscription, consentement, suppression du compte \\
+    \hline
+    \rowcolor{iacsLightGray}
+    \texttt{test\_auth.py} & 13 & Hachage et vérification des mots de passe \\
+    \hline
+    \texttt{test\_questionnaire.py} & 8 & Chargement et validation du questionnaire \\
+    \hline
+    \rowcolor{iacsLightGray}
+    \texttt{test\_templates.py} & 7 & Fiche de poste RSSI junior \\
+    \hline
+    \texttt{test\_recommendations\_data.py} & 6 & Références du guide et de l'ISO vérifiées \\
+    \hline
+    \rowcolor{iacsLightGray}
+    \texttt{test\_profiles.py} & 3 & Les 3 profils de démonstration \\
+    \hline
+    \textbf{Total} & \textbf{285} & \\
     \hline
   \end{tabularx}
 \end{table}
 
-Les tests de bout en bout utilisent \texttt{streamlit.testing.v1.AppTest}, le framework officiel Streamlit qui simule un utilisateur réel cliquant dans l'application, sans navigateur ni serveur à lancer manuellement. Ils couvrent notamment le chargement de l'accueil sans erreur, les trois profils de démonstration affichant le score exact attendu, la désactivation du bouton \enquote{Suivant} tant qu'une réponse manque, le parcours complet dans les deux modes jusqu'à l'écran de score, et la présence du bouton de téléchargement \gls{pdf} en fin de parcours.
+Les 13 parcours de bout en bout démarrent leur propre serveur sur une base jetable. Ils couvrent les deux modes de questionnaire, le retour arrière, les trois profils, l'export \gls{pdf}, l'inscription avec consentement, l'historique, la suppression du compte, les points à revérifier, le badge, le replay du score, la navigation au clavier, l'affichage mobile et l'absence de toute requête vers un domaine extérieur.
 
-Le code respecte par ailleurs les règles de style PEP~8, avec zéro erreur relevée par flake8 (longueur de ligne maximale fixée à 120 caractères dans \texttt{setup.cfg}). Un pipeline d'intégration continue (\texttt{.github/workflows/ci.yml}) exécute automatiquement, à chaque \textit{push} ou \textit{pull request}, l'installation des dépendances, la vérification flake8 sur \texttt{src/}, \texttt{app.py} et \texttt{tests/}, ainsi que l'ensemble de la suite pytest avec couverture, sur un environnement Python~3.12 entièrement vierge.
+Un pipeline d'intégration continue (\texttt{.github/workflows/ci.yml}) s'exécute à chaque \textit{push} : flake8 et pytest côté serveur, avec une couverture minimale de 90\,\% ; vérification des types, lint, tests et compilation côté interface ; puis les parcours de bout en bout.
 
-\iacswarning{Une vérification d'installation sur environnement vierge a révélé, au Jalon~3, trois régressions de dépendances : la bibliothèque \texttt{pandas}, non utilisée dans le code mais cassant l'installation sur Python~3.12 ; une version de \texttt{streamlit} trop ancienne, cassant les tests \texttt{AppTest} ; et une version de \texttt{flake8} trop ancienne générant de faux positifs sur les f-strings. Ces trois régressions ont été corrigées, revérifiées de bout en bout, et sont désormais prévenues par le pipeline d'intégration continue.}
+\iacswarning{Au Jalon~3, une installation sur environnement vierge du prototype Streamlit avait révélé trois régressions de dépendances (\texttt{pandas}, \texttt{streamlit}, \texttt{flake8}). Elles ont été corrigées et sont depuis prévenues par l'intégration continue.}
 
 % -------------------------------------------------------
 \section{Fonctionnalités au-delà du périmètre strict}
 \label{sec:bonus}
 
-Deux fonctionnalités ont été développées au-delà du périmètre strict initialement défini : un module d'authentification par hachage bcrypt avec persistance multi-audits (historique des évaluations d'une même \gls{pme}), et l'export \gls{pdf}, qui est devenu périmètre officiel dès le Jalon~3. Ces éléments illustrent une anticipation des besoins au-delà du cahier des charges initial ; il convient toutefois de préciser que le module d'authentification n'est, à ce stade, pas pleinement intégré au flux principal validé.
+Au-delà du cahier des charges initial (questionnaire, score, export \gls{pdf}), l'application finale ajoute : le replay du score, les 30 règles de cohérence, des priorités pilotées par les réponses et doublement référencées, le rapport de trois pages avec QR code de réévaluation, le badge partageable, la fiche de poste de RSSI junior, le compte facultatif avec historique, et le fonctionnement entièrement hors ligne. Toutes ces fonctionnalités sont locales et déterministes : aucune ne dépend d'un service externe ni d'une clé d'\gls{api}.
 
 % -------------------------------------------------------
 \section{Résultats obtenus}
 \label{sec:resultats}
 
-Au terme du stage, la plateforme constitue un système fonctionnel de bout en bout, couvrant le parcours complet questionnaire~$\rightarrow$~score~$\rightarrow$~export \gls{pdf}. Elle a été validée par l'encadrant professionnel à chaque jalon, avec des retours explicites (\enquote{bravo, un livrable de qualité} au Jalon~1, \enquote{merci pour les résultats} au Jalon~2). Le code source est public et documenté à l'adresse \url{https://github.com/YOUSSEFKARROUM/PFA_CRMPI}, accompagné d'une documentation technique dédiée couvrant l'architecture, le guide d'installation, la référence des modules et le dépannage. Sur le plan de la qualité logicielle, le projet compte 52 tests automatisés, 90\,\% de couverture de code, un pipeline \gls{ci} opérationnel et une dette technique de lint nulle.
+La plateforme couvre le parcours complet questionnaire~$\rightarrow$~score~$\rightarrow$~priorités~$\rightarrow$~rapport \gls{pdf}~$\rightarrow$~suivi. Le prototype a été validé par l'encadrant professionnel à chaque jalon (\enquote{bravo, un livrable de qualité} au Jalon~1, \enquote{merci pour les résultats} au Jalon~2). Le code source est disponible à l'adresse \url{https://github.com/YOUSSEFKARROUM/PFA_CRMPI}. Sur le plan de la qualité, le projet compte 285 tests côté serveur, 71 côté interface, 13 parcours de bout en bout, 98\,\% de couverture et une intégration continue complète.
 
 % -------------------------------------------------------
 \section{Limites observées}
 \label{sec:limites}
 
-Plusieurs limites ont été identifiées à l'issue du stage :
+Pentascore est un premier repère, pas encore une référence :
 
 \begin{itemize}
-  \item Le périmètre reste mono-utilisateur ; le support multi-tenant complet n'est pas implémenté en production.
-  \item La base SQLite n'est pas adaptée à une montée en charge au-delà d'une cinquantaine d'utilisateurs concurrents ; une migration vers PostgreSQL est identifiée comme nécessaire pour un passage en production.
-  \item Le benchmarking anonymisé inter-\gls{pme} n'est pas encore implémenté.
-  \item La plateforme n'est aujourd'hui exécutée qu'en local ; le déploiement en ligne reste à réaliser (voir ci-dessous).
+  \item \textbf{Une évaluation déclarative} : le score reflète les réponses, pas la réalité du terrain. Les règles de cohérence réduisent ce risque sans le supprimer.
+  \item \textbf{Une validation sur trois PME fictives} : le moteur calcule juste, mais la justesse du diagnostic reste à prouver sur de vraies entreprises.
+  \item \textbf{Des poids égaux et des seuils fixes} : chaque question vaut 4 points ; les seuils 25, 50 et 75 ne sont pas encore calibrés sur des données réelles.
+  \item \textbf{Un référentiel figé, en français} : pas de comparaison entre \gls{pme} d'un même secteur.
+  \item \textbf{Une instance unique} : SQLite et la limitation de débit en mémoire ne conviennent pas à une montée en charge.
 \end{itemize}
 
 % -------------------------------------------------------
 \section{Perspectives d'amélioration}
 \label{sec:perspectives}
 
-Plusieurs pistes d'évolution ont été identifiées, certaines en concertation avec l'encadrant.
-
-\textbf{Déploiement en ligne.} La procédure prévue -- non encore réalisée au moment de la rédaction de ce rapport -- consiste à déployer la plateforme sur Streamlit Community Cloud, l'option la plus rapide pour donner un accès en ligne à l'encadrant : création d'une application depuis le dépôt GitHub public (branche \texttt{main}, fichier \texttt{app.py}), installation automatique de \texttt{requirements.txt}, et initialisation automatique de la base au premier lancement si \texttt{app.db} n'existe pas encore. Un point de vigilance a toutefois été identifié : le système de fichiers de Streamlit Community Cloud n'est pas garanti persistant entre redéploiements, ce qui rend la migration vers une base hébergée (par exemple PostgreSQL managé) nécessaire au-delà d'un usage de démonstration.
+À chaque limite correspond une suite :
 
 \begin{enumerate}
-  \item Migrer de Streamlit vers une architecture Django ou FastAPI côté serveur avec un frontend React, pour une version production multi-utilisateurs.
-  \item Migrer la base de données de SQLite vers PostgreSQL, notamment pour garantir la persistance des données en déploiement cloud.
-  \item Finaliser le déploiement sur Streamlit Community Cloud selon la procédure décrite ci-dessus.
-  \item Mettre en place un benchmarking sectoriel anonymisé entre \gls{pme}.
+  \item Demander des preuves (politique, capture) et proposer une évaluation accompagnée par le \gls{cmrpi}.
+  \item Conduire un pilote avec de vraies \gls{pme}, via le \gls{cmrpi} et l'\gls{ausim}, et comparer les résultats à l'avis d'un auditeur.
+  \item Pondérer selon la criticité et calibrer les seuils sur les données du pilote.
+  \item Proposer une version arabe, une comparaison par secteur, et mettre à jour le référentiel avec le guide, l'ISO et le NIST.
+  \item Déployer la plateforme en ligne avec une base PostgreSQL.
   \item Étudier la faisabilité d'une certification \enquote{PME Cyber-Sûre}, piste évoquée avec l'encadrant.
-  \item Étendre le questionnaire à des \textit{tracks} sectoriels spécialisés (Finance, Santé, E-commerce).
 \end{enumerate}
 
 \section*{Conclusion}
 
-Ce chapitre a présenté la conception et la réalisation de la plateforme d'auto-évaluation de la maturité cybersécurité : architecture technique, modélisation des données et du questionnaire, méthodologie de scoring justifiée académiquement, réalisation de l'interface et de l'export \gls{pdf}, ainsi que les tests et résultats obtenus. Les limites observées et les perspectives identifiées tracent les prochaines étapes envisageables pour faire évoluer cette plateforme vers un usage en production.
+Ce chapitre a présenté la conception et la réalisation de la plateforme : la démarche en jalons, du prototype Streamlit à l'application finale Pentascore ; une architecture qui sépare interface, \gls{api} et moteur métier ; une méthodologie de scoring justifiée et explicable ; les fonctionnalités qui aident la \gls{pme} à agir ; et une qualité logicielle vérifiée par plus de 350 tests. Les limites identifiées tracent les prochaines étapes vers un usage réel.

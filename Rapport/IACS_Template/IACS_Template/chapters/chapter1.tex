@@ -139,7 +139,7 @@ Les objectifs secondaires associés sont :
 
 \subsection{Périmètre du projet}
 
-Le périmètre retenu pour le stage inclut un questionnaire de 25 questions, un moteur de scoring, l'export des résultats au format \gls{pdf} et une interface développée avec le framework Streamlit. Sont en revanche exclus du périmètre du stage, et identifiés comme perspectives futures~: l'authentification multi-tenant en production, le benchmarking inter-\gls{pme}, la certification \enquote{PME Cyber-Sûre} et l'exposition d'une \gls{api} publique.
+Le périmètre retenu pour le stage inclut un questionnaire de 25 questions, un moteur de scoring, l'export des résultats au format \gls{pdf} et une interface web. Un prototype Streamlit a d'abord servi à valider le moteur ; l'application finale repose sur React et FastAPI (voir chapitre~\ref{chap:conception}). Sont en revanche exclus du périmètre du stage, et identifiés comme perspectives futures~: l'authentification multi-tenant en production, le benchmarking inter-\gls{pme}, la certification \enquote{PME Cyber-Sûre} et l'exposition d'une \gls{api} publique.
 
 \subsection{Cahier des charges}
 
@@ -176,7 +176,7 @@ Le tableau~\ref{tab:cahier_charges} résume les spécifications fonctionnelles e
 \section{Planification du projet}
 \label{sec:planification}
 
-Le stage s'est déroulé du \textbf{15~juillet} au \textbf{31~août~2026}, soit une durée de sept semaines, organisée en trois jalons validés successivement par l'encadrant professionnel. Le tableau~\ref{tab:planning} détaille ce découpage et son statut de réalisation.
+Le stage s'est déroulé du \textbf{15~juillet} au \textbf{31~août~2026}, soit une durée de sept semaines, organisée en trois jalons validés successivement par l'encadrant professionnel. Un quatrième jalon, mené dans le prolongement du stage, a transformé le prototype en application finale. Le tableau~\ref{tab:planning} détaille ce découpage et son statut de réalisation.
 
 \begin{table}[H]
   \centering
@@ -197,6 +197,9 @@ Le stage s'est déroulé du \textbf{15~juillet} au \textbf{31~août~2026}, soit 
     2 & 1--15 août 2026 & Interface Streamlit fonctionnelle et tests & Complété \\
     \hline
     3 & 16--31 août 2026 & Export \gls{pdf}, tests de bout en bout, documentation & Complété \\
+    \hline
+    \rowcolor{iacsLightGray}
+    4 & Prolongement & Application finale React + FastAPI, cohérence, badge, historique, hors ligne & Complété \\
     \hline
   \end{tabularx}
 \end{table}

@@ -12,21 +12,22 @@
 
 \begin{itemize}
   \item Une analyse des référentiels normatifs (guide \gls{cmrpi}/\gls{ausim}, \gls{iso27001}, \gls{nistcsf}, loi 09-08) a permis de justifier académiquement une structure de questionnaire en 5 domaines et 25 questions.
-  \item Une plateforme fonctionnelle a été conçue et développée, intégrant un questionnaire d'auto-évaluation, un moteur de scoring automatisé et reproductible, ainsi qu'un export de rapports personnalisés au format \gls{pdf}.
-  \item La qualité logicielle de la plateforme a été validée par 52 tests automatisés, 90\,\% de couverture de code et un pipeline d'intégration continue, avec une validation de la cohérence méthodologique sur trois profils fictifs de \gls{pme}.
+  \item Une plateforme fonctionnelle a été conçue et développée, intégrant un questionnaire d'auto-évaluation, un moteur de scoring automatisé et reproductible, ainsi qu'un export de rapports personnalisés au format \gls{pdf}. Validée d'abord sous forme de prototype Streamlit, elle a ensuite été reconstruite en application finale, Pentascore : interface React, API FastAPI, moteur Python et base SQLite, fonctionnant entièrement hors ligne.
+  \item La qualité logicielle de la plateforme a été validée par 285 tests côté serveur, 71 tests côté interface et 13 parcours de bout en bout, 98\,\% de couverture de code et un pipeline d'intégration continue, avec une validation de la cohérence méthodologique sur trois profils fictifs de \gls{pme}.
   \item La démarche a été menée en trois jalons itératifs, avec un suivi hebdomadaire et une validation systématique par l'encadrant professionnel, le Dr.~Rachid Abouettahir.
 \end{itemize}
 
 \vspace{0.5cm}
-\textbf{Compétences mobilisées :} analyse de référentiels normatifs en cybersécurité, conception d'une méthodologie de scoring justifiée académiquement, développement full-stack en Python, mise en place de tests automatisés et d'un pipeline d'intégration continue, gestion de projet et communication avec un encadrant professionnel.
+\textbf{Compétences mobilisées :} analyse de référentiels normatifs en cybersécurité, conception d'une méthodologie de scoring justifiée académiquement, développement full-stack (Python, FastAPI, React et TypeScript), mise en place de tests automatisés et d'un pipeline d'intégration continue, gestion de projet et communication avec un encadrant professionnel.
 
 \vspace{0.5cm}
 \textbf{Perspectives :}
 
 \begin{enumerate}
-  \item Migrer l'architecture vers Django ou FastAPI côté serveur avec un frontend React, pour une version production multi-utilisateurs.
-  \item Migrer la base de données de SQLite vers PostgreSQL afin de supporter une montée en charge.
-  \item Déployer la plateforme sur Streamlit Community Cloud et finaliser la documentation technique.
+  \item Conduire un pilote avec de vraies \gls{pme}, via le \gls{cmrpi} et l'\gls{ausim}, et comparer les résultats à l'avis d'un auditeur.
+  \item Demander des preuves (politique, capture) et proposer une évaluation accompagnée par le \gls{cmrpi}.
+  \item Calibrer les poids et les seuils sur les données du pilote ; proposer une version arabe.
+  \item Déployer la plateforme en ligne, avec une base PostgreSQL.
   \item Mettre en place un benchmarking sectoriel anonymisé entre \gls{pme} et étudier la faisabilité d'une certification \enquote{PME Cyber-Sûre}.
 \end{enumerate}
 
