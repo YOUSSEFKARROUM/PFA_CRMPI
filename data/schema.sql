@@ -1,5 +1,5 @@
 -- ============================================================
--- CMRPI Platform — Schéma de base de données (SQLite)
+-- Pentascore (CMRPI) — Schéma de base de données (SQLite)
 -- Jalon 1 — Juillet 2026
 -- ============================================================
 
@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS pme (
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
     sector TEXT,
+    consent_at DATETIME,              -- horodatage du consentement explicite (loi 09-08)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -54,8 +55,11 @@ CREATE TABLE IF NOT EXISTS recommendation (
     priority INTEGER,
     text_fr TEXT NOT NULL,
     text_en TEXT NOT NULL,
-    reference TEXT,
-    effort TEXT
+    reference TEXT,                   -- ISO/IEC 27001:2022 (annexe A ou clause)
+    effort TEXT,
+    guide_ref TEXT,                   -- Guide AUSIM-CMRPI 2018, section réelle
+    question_id TEXT,                 -- question déclenchante (NULL = recommandation générale)
+    trigger_max INTEGER               -- s'applique si la réponse <= trigger_max
 );
 
 CREATE TABLE IF NOT EXISTS audit_log (

@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "description": "Règles de cohérence déclarative Pentascore. Forme unique : si la question « if » atteint « min », la question « then » devrait atteindre au moins « min ». Lecture seule : aucun effet sur les scores ni sur les recommandations.",
+  "kinds": {
+    "declaration": "La réponse choisie mentionne elle-même une pratique qu'une autre réponse déclare absente.",
+    "prerequisite": "Une pratique avancée est déclarée alors que la pratique dont elle dépend est absente ou très faible."
+  },
+  "rules": [
+    {
+      "id": "CR-01", "kind": "declaration",
+      "if": {"question": "q6", "min": 4}, "then": {"question": "q8", "min": 3},
+      "title": "MFA mentionné sur l'annuaire, absent de la question MFA",
+      "rationale": "Votre réponse sur la gestion des identités inclut l'authentification multifacteur, alors que la question dédiée la déclare absente ou optionnelle.",
+      "reference": "ISO/IEC 27001:2022 A.8.5"
+    },
+    {
+      "id": "CR-02", "kind": "declaration",
+      "if": {"question": "q7", "min": 5}, "then": {"question": "q8", "min": 3},
+      "title": "MFA mentionné dans la politique de mots de passe, absent de la question MFA",
+      "rationale": "La politique de mots de passe déclarée inclut le MFA, alors que la question dédiée le déclare absent ou optionnel.",
+      "reference": "ISO/IEC 27001:2022 A.8.5"
+    },
+    {
+      "id": "CR-03", "kind": "declaration",
+      "if": {"question": "q25", "min": 4}, "then": {"question": "q8", "min": 3},
+      "title": "MFA exigé en télétravail, absent de la question MFA",
+      "rationale": "La politique de télétravail déclarée impose le MFA, alors que la question dédiée le déclare absent ou optionnel.",
+      "reference": "ISO/IEC 27001:2022 A.6.7"
+    },
+    {
+      "id": "CR-04", "kind": "declaration",
+      "if": {"question": "q25", "min": 4}, "then": {"question": "q14", "min": 3},
+      "title": "Antivirus obligatoire en télétravail, mais antivirus absent ou obsolète",
+      "rationale": "La politique de télétravail déclarée impose un antivirus, alors que la question sur la protection des postes le déclare absent ou non mis à jour.",
+      "reference": "ISO/IEC 27001:2022 A.8.7"
+    },
+    {
+      "id": "CR-05", "kind": "declaration",
+      "if": {"question": "q11", "min": 3}, "then": {"question": "q15", "min": 2},
+      "title": "DMZ mentionnée sur le pare-feu, réseau déclaré plat",
+      "rationale": "Votre réponse sur le pare-feu inclut une DMZ, alors que la question sur la segmentation décrit un réseau plat.",
+      "reference": "ISO/IEC 27001:2022 A.8.22"
+    },
+    {
+      "id": "CR-06", "kind": "declaration",
+      "if": {"question": "q11", "min": 4}, "then": {"question": "q15", "min": 3},
+      "title": "VLAN mentionnés sur le pare-feu, absents de la segmentation",
+      "rationale": "Votre réponse sur le pare-feu inclut des VLAN, alors que la question sur la segmentation n'en déclare aucun.",
+      "reference": "ISO/IEC 27001:2022 A.8.22"
+    },
+    {
+      "id": "CR-07", "kind": "declaration",
+      "if": {"question": "q15", "min": 2}, "then": {"question": "q11", "min": 2},
+      "title": "Réseau segmenté sans pare-feu déclaré",
+      "rationale": "Une DMZ ou des VLAN reposent sur un pare-feu, or la question sur le pare-feu le déclare absent.",
+      "reference": "ISO/IEC 27001:2022 A.8.20"
+    },
+    {
+      "id": "CR-08", "kind": "declaration",
+      "if": {"question": "q13", "min": 4}, "then": {"question": "q17", "min": 3},
+      "title": "Sauvegardes testées deux fois par an, restaurations non testées",
+      "rationale": "Tester une sauvegarde consiste à la restaurer, or la question sur les tests de restauration les déclare inexistants ou ponctuels.",
+      "reference": "ISO/IEC 27001:2022 A.8.13"
+    },
+    {
+      "id": "CR-09", "kind": "declaration",
+      "if": {"question": "q17", "min": 3}, "then": {"question": "q13", "min": 3},
+      "title": "Restaurations testées, sauvegardes non régulières",
+      "rationale": "Des tests de restauration réguliers supposent des sauvegardes régulières, or celles-ci sont déclarées absentes ou sporadiques.",
+      "reference": "ISO/IEC 27001:2022 A.8.13"
+    },
+    {
+      "id": "CR-10", "kind": "declaration",
+      "if": {"question": "q16", "min": 4}, "then": {"question": "q19", "min": 2},
+      "title": "Plan mis à jour après incident, sans analyse des incidents",
+      "rationale": "Votre plan de réponse est déclaré mis à jour après chaque incident, alors que la question sur l'analyse post-incident la déclare absente.",
+      "reference": "ISO/IEC 27001:2022 A.5.27"
+    },
+    {
+      "id": "CR-11", "kind": "declaration",
+      "if": {"question": "q6", "min": 5}, "then": {"question": "q10", "min": 3},
+      "title": "IAM avec audit, revue des accès absente ou ponctuelle",
+      "rationale": "Votre solution d'identités est déclarée auditée, alors que la question sur l'audit des accès le déclare absent ou limité aux incidents.",
+      "reference": "ISO/IEC 27001:2022 A.5.18"
+    },
+    {
+      "id": "CR-12", "kind": "prerequisite",
+      "if": {"question": "q4", "min": 3}, "then": {"question": "q2", "min": 2},
+      "title": "Comité sécurité régulier sans responsable désigné",
+      "rationale": "Un comité qui se réunit au moins chaque trimestre est normalement animé par un responsable sécurité, interne ou externe.",
+      "reference": "ISO/IEC 27001:2022 A.5.2"
+    },
+    {
+      "id": "CR-13", "kind": "prerequisite",
+      "if": {"question": "q1", "min": 4}, "then": {"question": "q2", "min": 2},
+      "title": "Politique revue chaque année sans responsable désigné",
+      "rationale": "La revue annuelle d'une politique de sécurité suppose une personne chargée de la conduire.",
+      "reference": "ISO/IEC 27001:2022 A.5.1"
+    },
+    {
+      "id": "CR-14", "kind": "prerequisite",
+      "if": {"question": "q3", "min": 4}, "then": {"question": "q1", "min": 2},
+      "title": "Analyse de risques outillée sans politique de sécurité",
+      "rationale": "Une analyse de risques fondée sur une méthodologie reconnue s'inscrit normalement dans une politique de sécurité, au moins en projet.",
+      "reference": "ISO/IEC 27001:2022 A.5.1"
+    },
+    {
+      "id": "CR-15", "kind": "prerequisite",
+      "if": {"question": "q2", "min": 4}, "then": {"question": "q5", "min": 2},
+      "title": "Responsable sécurité à temps plein sans aucun budget",
+      "rationale": "Un poste de RSSI à temps plein s'accompagne normalement d'un budget, même alloué au cas par cas.",
+      "reference": "ISO/IEC 27001:2022 §7.1"
+    },
+    {
+      "id": "CR-16", "kind": "prerequisite",
+      "if": {"question": "q5", "min": 4}, "then": {"question": "q2", "min": 2},
+      "title": "Budget sécurité significatif sans responsable désigné",
+      "rationale": "Un budget d'au moins 5 % de l'informatique suppose une personne chargée de l'engager et d'en suivre l'usage.",
+      "reference": "ISO/IEC 27001:2022 A.5.2"
+    },
+    {
+      "id": "CR-17", "kind": "prerequisite",
+      "if": {"question": "q23", "min": 4}, "then": {"question": "q1", "min": 2},
+      "title": "Charte d'utilisation signée sans politique de sécurité",
+      "rationale": "Une charte d'utilisation largement signée découle normalement d'une politique de sécurité, au moins en projet.",
+      "reference": "ISO/IEC 27001:2022 A.5.10"
+    },
+    {
+      "id": "CR-18", "kind": "prerequisite",
+      "if": {"question": "q8", "min": 4}, "then": {"question": "q6", "min": 2},
+      "title": "MFA généralisé sans gestion centralisée des identités",
+      "rationale": "Déployer le MFA pour la majorité des utilisateurs suppose de gérer leurs comptes de façon centralisée, au moins en partie.",
+      "reference": "ISO/IEC 27001:2022 A.5.16"
+    },
+    {
+      "id": "CR-19", "kind": "prerequisite",
+      "if": {"question": "q8", "min": 4}, "then": {"question": "q7", "min": 2},
+      "title": "MFA généralisé sans politique de mots de passe",
+      "rationale": "Le MFA complète le mot de passe sans le remplacer : une règle minimale sur les mots de passe reste attendue.",
+      "reference": "ISO/IEC 27001:2022 A.5.17"
+    },
+    {
+      "id": "CR-20", "kind": "prerequisite",
+      "if": {"question": "q9", "min": 4}, "then": {"question": "q6", "min": 3},
+      "title": "Contrôle d'accès par rôles complet sans annuaire central",
+      "rationale": "Gérer une dizaine de rôles ou plus suppose un annuaire central (AD, LDAP ou IAM) pour les attribuer.",
+      "reference": "ISO/IEC 27001:2022 A.5.15"
+    },
+    {
+      "id": "CR-21", "kind": "prerequisite",
+      "if": {"question": "q10", "min": 4}, "then": {"question": "q9", "min": 3},
+      "title": "Audit détaillé des accès sans rôles définis",
+      "rationale": "Un audit mensuel ou continu des accès compare les droits réels à des rôles de référence, or aucun rôle n'est déclaré.",
+      "reference": "ISO/IEC 27001:2022 A.5.18"
+    },
+    {
+      "id": "CR-22", "kind": "prerequisite",
+      "if": {"question": "q10", "min": 5}, "then": {"question": "q16", "min": 2},
+      "title": "Surveillance continue des accès sans plan de réponse",
+      "rationale": "Des alertes de sécurité en continu supposent une procédure décrivant quoi faire lorsqu'elles se déclenchent.",
+      "reference": "ISO/IEC 27001:2022 A.8.16"
+    },
+    {
+      "id": "CR-23", "kind": "prerequisite",
+      "if": {"question": "q14", "min": 4}, "then": {"question": "q16", "min": 2},
+      "title": "EDR déployé sans plan de réponse aux incidents",
+      "rationale": "Un EDR détecte et signale des menaces : sans plan de réponse, ses alertes ne sont pas traitées de façon prévisible.",
+      "reference": "ISO/IEC 27001:2022 A.5.24"
+    },
+    {
+      "id": "CR-24", "kind": "prerequisite",
+      "if": {"question": "q16", "min": 3}, "then": {"question": "q20", "min": 2},
+      "title": "Plan de réponse testé sans canal de signalement",
+      "rationale": "Un plan de réponse démarre par un signalement : un contact dédié (adresse ou ligne) est attendu.",
+      "reference": "ISO/IEC 27001:2022 A.6.8"
+    },
+    {
+      "id": "CR-25", "kind": "prerequisite",
+      "if": {"question": "q19", "min": 3}, "then": {"question": "q20", "min": 2},
+      "title": "Tous les incidents documentés sans canal de signalement",
+      "rationale": "Documenter systématiquement les incidents suppose qu'ils remontent par un canal identifié.",
+      "reference": "ISO/IEC 27001:2022 A.6.8"
+    },
+    {
+      "id": "CR-26", "kind": "prerequisite",
+      "if": {"question": "q16", "min": 4}, "then": {"question": "q17", "min": 3},
+      "title": "Exercices d'incident fréquents sans test de restauration",
+      "rationale": "Un plan de réponse testé deux fois par an inclut normalement la restauration de données au moins une fois par an.",
+      "reference": "ISO/IEC 27001:2022 A.5.29"
+    },
+    {
+      "id": "CR-27", "kind": "prerequisite",
+      "if": {"question": "q18", "min": 4}, "then": {"question": "q17", "min": 3},
+      "title": "Plan de continuité testé sans test de restauration",
+      "rationale": "Tester un plan de continuité suppose de vérifier que les données peuvent être restaurées.",
+      "reference": "ISO/IEC 27001:2022 A.5.30"
+    },
+    {
+      "id": "CR-28", "kind": "prerequisite",
+      "if": {"question": "q18", "min": 4}, "then": {"question": "q16", "min": 2},
+      "title": "Plan de continuité testé sans plan de réponse aux incidents",
+      "rationale": "La continuité d'activité s'appuie sur une procédure de réponse aux incidents, au moins documentée.",
+      "reference": "ISO/IEC 27001:2022 A.5.24"
+    },
+    {
+      "id": "CR-29", "kind": "prerequisite",
+      "if": {"question": "q24", "min": 4}, "then": {"question": "q22", "min": 3},
+      "title": "Simulations d'hameçonnage fréquentes, sensibilisation ponctuelle",
+      "rationale": "Des campagnes de simulation trimestrielles ou plus s'accompagnent normalement d'une sensibilisation au moins annuelle.",
+      "reference": "ISO/IEC 27001:2022 A.6.3"
+    },
+    {
+      "id": "CR-30", "kind": "prerequisite",
+      "if": {"question": "q21", "min": 4}, "then": {"question": "q22", "min": 2},
+      "title": "Formation annuelle généralisée sans volet hameçonnage",
+      "rationale": "Une formation suivie par 80 % du personnel ou plus aborde normalement l'hameçonnage, premier vecteur d'attaque des PME.",
+      "reference": "ISO/IEC 27001:2022 A.6.3"
+    }
+  ]
+}

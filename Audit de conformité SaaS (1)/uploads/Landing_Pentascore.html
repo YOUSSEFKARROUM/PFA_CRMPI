@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pentascore — Auto-évaluation de la maturité cybersécurité</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper: #FAF8F2;
+  --paper-2: #F1EEE3;
+  --ink: #10202F;
+  --ink-soft: rgba(16,32,47,0.62);
+  --ink-faint: rgba(16,32,47,0.42);
+  --line: rgba(16,32,47,0.12);
+  --emerald: #0A7D68;
+  --emerald-dark: #095C4D;
+  --emerald-wash: rgba(10,125,104,0.07);
+  --gold: #A9824C;
+  --coral: #D24A2E;
+  --coral-wash: rgba(210,74,46,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{ color:var(--emerald); text-decoration:none; }
+.container{ max-width:1120px; margin:0 auto; padding:0 clamp(20px,6vw,64px); }
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--emerald); display:flex; align-items:center;
+}
+.eyebrow::before{ content:''; width:20px; height:1px; background:var(--emerald); display:inline-block; margin-right:10px; }
+
+/* ---- reveal on scroll ---- */
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1); }
+.reveal.in{ opacity:1; transform:translateY(0); }
+.reveal-d1{ transition-delay:.08s; }
+.reveal-d2{ transition-delay:.16s; }
+.reveal-d3{ transition-delay:.24s; }
+.reveal-d4{ transition-delay:.32s; }
+
+/* ---- nav ---- */
+.nav{
+  position:sticky; top:0; z-index:50; background:rgba(250,248,242,0.88);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+}
+.nav-inner{ display:flex; align-items:center; justify-content:space-between; padding:20px 0; }
+.nav-brand{ display:flex; align-items:center; }
+.nav-brand .logo{ font-family:'Fraunces',serif; font-weight:600; font-size:19px; letter-spacing:-.01em; }
+.nav-brand .tag{ font-size:12.5px; color:var(--ink-soft); margin-left:12px; }
+.nav-links{ display:flex; align-items:center; }
+.nav-links a{ font-size:14px; color:var(--ink-soft); margin-left:32px; }
+.nav-links a:hover{ color:var(--ink); }
+.nav-cta{
+  margin-left:32px !important; background:var(--ink); color:var(--paper) !important;
+  padding:9px 20px; font-size:13.5px; font-weight:500; transition:background .2s ease;
+}
+.nav-cta:hover{ background:var(--emerald) !important; }
+
+/* ---- hero ---- */
+.hero{ padding:clamp(60px,10vh,110px) 0 clamp(50px,8vh,90px); }
+.hero-grid{ display:flex; align-items:center; }
+.hero-text{ flex:1.05; padding-right:clamp(20px,5vw,60px); }
+.hero-visual{ flex:0.95; }
+.hero-text h1{
+  font-family:'Fraunces',serif; font-weight:500; font-size:clamp(38px,4.6vw,60px);
+  line-height:1.06; letter-spacing:-.02em; margin-bottom:26px;
+}
+.hero-text h1 em{ font-style:normal; color:var(--emerald); }
+.hero-text p{ font-size:17.5px; line-height:1.65; color:var(--ink-soft); max-width:46ch; margin-bottom:36px; }
+.btn-primary{
+  display:inline-block; background:var(--emerald); color:var(--paper); border:none;
+  padding:16px 32px; font-size:16px; font-weight:500; cursor:pointer;
+  transition:background .2s ease, transform .2s ease;
+}
+.btn-primary:hover{ background:var(--emerald-dark); transform:translateY(-1px); }
+.btn-ghost{
+  display:inline-block; background:transparent; color:var(--ink); border:1px solid var(--line);
+  padding:15px 28px; font-size:15px; font-weight:500; margin-left:14px; transition:border-color .2s ease;
+}
+.btn-ghost:hover{ border-color:var(--ink); }
+
+#heroSvg{ width:100%; height:auto; display:block; }
+
+/* ---- stats bar ---- */
+.stats{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:56px 0; }
+.stats-row{ display:flex; }
+.stat-item{ flex:1; padding-right:40px; }
+.stat-item:last-child{ padding-right:0; }
+.stat-num{ font-family:'Fraunces',serif; font-weight:600; font-size:clamp(38px,4vw,54px); line-height:1; }
+.stat-num .suf{ color:var(--gold); }
+.stat-label{ font-size:14.5px; color:var(--ink-soft); margin-top:10px; line-height:1.5; max-width:26ch; }
+.stat-src{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); margin-top:10px; }
+
+/* ---- domains section ---- */
+.domains{ padding:clamp(70px,10vh,120px) 0; }
+.domains-head{ max-width:640px; margin-bottom:56px; }
+.domains-head h2{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); margin-top:16px; letter-spacing:-.01em; }
+.domains-grid{ display:flex; align-items:center; }
+.domains-viz{ flex:0.85; }
+#domPentagon{ width:100%; height:auto; }
+.domains-list{ flex:1.15; padding-left:clamp(20px,5vw,60px); }
+.domain-row{ display:flex; align-items:flex-start; padding:22px 0; border-bottom:1px solid var(--line); }
+.domain-row:first-child{ padding-top:0; }
+.domain-num{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--emerald); width:32px; flex-shrink:0; padding-top:3px; }
+.domain-txt .n{ font-family:'Fraunces',serif; font-size:19px; font-weight:500; }
+.domain-txt .d{ font-size:14.5px; color:var(--ink-soft); margin-top:4px; line-height:1.5; }
+
+/* ---- how it works ---- */
+.how{ background:var(--paper-2); padding:clamp(70px,10vh,120px) 0; }
+.how-head{ max-width:640px; margin-bottom:56px; }
+.how-head h2{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); margin-top:16px; letter-spacing:-.01em; }
+.how-row{ display:flex; }
+.how-step{ flex:1; padding-right:36px; }
+.how-step:last-child{ padding-right:0; }
+.how-step .idx{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold); margin-bottom:16px; }
+.how-step h3{ font-family:'Fraunces',serif; font-size:20px; font-weight:500; margin-bottom:10px; }
+.how-step p{ font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:18px; }
+.how-mock{
+  background:var(--paper); border:1px solid var(--line); padding:16px 18px;
+  font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);
+}
+.how-mock .hl{ color:var(--emerald); font-weight:600; }
+.how-mock .hl2{ color:var(--coral); font-weight:600; }
+
+/* ---- demo profiles ---- */
+.demos{ padding:clamp(70px,10vh,120px) 0; }
+.demos-head{ max-width:640px; margin-bottom:56px; }
+.demos-head h2{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); margin-top:16px; letter-spacing:-.01em; }
+.demo-row{ display:flex; }
+.demo-card{
+  flex:1; border:1px solid var(--line); padding:28px 26px; margin-right:20px;
+  transition:border-color .2s ease, transform .2s ease; cursor:pointer;
+}
+.demo-card:last-child{ margin-right:0; }
+.demo-card:hover{ border-color:var(--ink); transform:translateY(-3px); }
+.demo-card .sector{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; }
+.demo-card .name{ font-family:'Fraunces',serif; font-size:21px; font-weight:500; margin-bottom:20px; }
+.demo-card .score{ font-family:'IBM Plex Mono',monospace; font-size:44px; font-weight:600; line-height:1; }
+.demo-card .level{ font-size:13.5px; margin-top:8px; font-weight:500; }
+.demo-card .arrow{ margin-top:20px; font-size:13.5px; color:var(--ink-soft); }
+
+/* ---- final cta ---- */
+.cta-final{ background:var(--ink); color:var(--paper); padding:clamp(70px,10vh,110px) 0; text-align:center; }
+.cta-final .eyebrow{ justify-content:center; color:var(--emerald); }
+.cta-final .eyebrow::before{ display:none; }
+.cta-final h2{
+  font-family:'Fraunces',serif; font-weight:500; font-size:clamp(32px,4.2vw,54px);
+  margin:18px 0 30px; letter-spacing:-.02em; max-width:760px; margin-left:auto; margin-right:auto;
+}
+.cta-final .btn-primary{ background:var(--paper); color:var(--ink); }
+.cta-final .btn-primary:hover{ background:var(--emerald); color:var(--paper); }
+
+/* ---- footer ---- */
+footer{ padding:44px 0; border-top:1px solid var(--line); }
+.foot-row{ display:flex; align-items:baseline; justify-content:space-between; }
+.foot-row .logo{ font-family:'Fraunces',serif; font-weight:600; font-size:16px; }
+.foot-row .meta{ font-size:12.5px; color:var(--ink-faint); }
+
+@media (max-width: 880px){
+  .hero-grid, .domains-grid, .demo-row, .how-row, .stats-row{ flex-direction:column; align-items:stretch; }
+  .hero-text{ padding-right:0; margin-bottom:48px; }
+  .domains-list{ padding-left:0; margin-top:40px; }
+  .demo-card{ margin-right:0; margin-bottom:18px; }
+  .how-step{ padding-right:0; margin-bottom:40px; }
+  .stat-item{ padding-right:0; margin-bottom:32px; }
+  .nav-links{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <div class="nav-brand">
+      <svg width="26" height="26" viewBox="0 0 100 100" id="navLogo" style="margin-right:12px; flex-shrink:0;"></svg>
+      <span class="logo">Penta<span style="color:var(--emerald);">score</span></span>
+      <span class="tag">par CMRPI — Espace Maroc Cyberconfiance</span>
+    </div>
+    <div class="nav-links">
+      <a href="#domains">Domaines</a>
+      <a href="#how">Méthode</a>
+      <a href="#demos">Démonstration</a>
+      <a href="#start" class="nav-cta">Commencer</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text reveal in">
+      <div class="eyebrow">CMRPI · ESPACE MAROC CYBERCONFIANCE</div>
+      <h1 style="margin-top:18px;">Où en est réellement la sécurité numérique <em>de votre entreprise</em>&nbsp;?</h1>
+      <p>25 questions, 5 domaines, environ 12 minutes. À la fin : un score de maturité, le détail domaine par domaine, et deux à trois actions prioritaires. Aucun prérequis technique.</p>
+      <a href="#start" class="btn-primary">Commencer l'évaluation</a>
+      <a href="#demos" class="btn-ghost">Voir un exemple</a>
+    </div>
+    <div class="hero-visual reveal reveal-d2 in">
+      <svg id="heroSvg" viewBox="0 0 420 420"></svg>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="container stats-row">
+    <div class="stat-item reveal">
+      <div class="stat-num"><span data-count="60">0</span><span class="suf">%</span></div>
+      <div class="stat-label">des cyberattaques recensées au Maroc visent des PME, pas des grands groupes.</div>
+      <div class="stat-src">DGSSI, 2025</div>
+    </div>
+    <div class="stat-item reveal reveal-d1">
+      <div class="stat-num"><span data-count="879">0</span></div>
+      <div class="stat-label">cyberattaques traitées par la DGSSI en 2025, dont 109 avec intervention du maCERT.</div>
+      <div class="stat-src">DGSSI, rapport annuel 2025</div>
+    </div>
+    <div class="stat-item reveal reveal-d2">
+      <div class="stat-num">Tier 1</div>
+      <div class="stat-label">classement mondial du Maroc à l'indice de cybersécurité de l'ITU — 97,5/100.</div>
+      <div class="stat-src">ITU, 2024</div>
+    </div>
+  </div>
+</section>
+
+<section class="domains" id="domains">
+  <div class="container">
+    <div class="domains-head reveal">
+      <div class="eyebrow">LA MÉTHODE</div>
+      <h2>Cinq domaines, alignés sur les référentiels internationaux</h2>
+    </div>
+    <div class="domains-grid">
+      <div class="domains-viz reveal reveal-d1">
+        <svg id="domPentagon" viewBox="0 0 400 400"></svg>
+      </div>
+      <div class="domains-list">
+        <div class="domain-row reveal reveal-d1"><div class="domain-num">01</div><div class="domain-txt"><div class="n">Gouvernance</div><div class="d">Politique de sécurité écrite, responsable désigné, budget dédié.</div></div></div>
+        <div class="domain-row reveal reveal-d2"><div class="domain-num">02</div><div class="domain-txt"><div class="n">Accès &amp; Identités</div><div class="d">Authentification multi-facteurs, contrôle d'accès par rôle.</div></div></div>
+        <div class="domain-row reveal reveal-d3"><div class="domain-num">03</div><div class="domain-txt"><div class="n">Infrastructure &amp; Réseau</div><div class="d">Pare-feu, chiffrement des données, sauvegardes testées.</div></div></div>
+        <div class="domain-row reveal reveal-d4"><div class="domain-num">04</div><div class="domain-txt"><div class="n">Incidents &amp; Continuité</div><div class="d">Plan de réponse documenté, procédure de reprise d'activité.</div></div></div>
+        <div class="domain-row reveal reveal-d4"><div class="domain-num">05</div><div class="domain-txt"><div class="n">Sensibilisation</div><div class="d">Formation régulière, tests de vigilance des équipes.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="container">
+    <div class="how-head reveal">
+      <div class="eyebrow">EN PRATIQUE</div>
+      <h2>Trois étapes, aucune installation</h2>
+    </div>
+    <div class="how-row">
+      <div class="how-step reveal reveal-d1">
+        <div class="idx">01 / RÉPONDRE</div>
+        <h3>Questionnaire clair</h3>
+        <p>Au choix, par section ou question par question. Chaque question a son explication.</p>
+        <div class="how-mock">Q6 — Accès &amp; Identités<br>&gt; <span class="hl">3 — Active Directory basique</span></div>
+      </div>
+      <div class="how-step reveal reveal-d2">
+        <div class="idx">02 / CALCULER</div>
+        <h3>Score automatique</h3>
+        <p>Un score par domaine et un score global, calculés instantanément selon une formule vérifiable.</p>
+        <div class="how-mock">Gouvernance <span class="hl">50% — Moyen</span><br>Sensibilisation <span class="hl2">30% — Faible</span></div>
+      </div>
+      <div class="how-step reveal reveal-d3">
+        <div class="idx">03 / AGIR</div>
+        <h3>Recommandations ciblées</h3>
+        <p>2 à 3 actions prioritaires, choisies selon vos domaines les plus faibles — pas une liste générique.</p>
+        <div class="how-mock"><span class="hl2">[Haute]</span> Formation cybersécurité annuelle</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demos" id="demos">
+  <div class="container">
+    <div class="demos-head reveal">
+      <div class="eyebrow">DÉMONSTRATION</div>
+      <h2>Trois profils réels, trois résultats différents</h2>
+    </div>
+    <div class="demo-row">
+      <div class="demo-card reveal reveal-d1">
+        <div class="sector">FINANCE</div>
+        <div class="name">PME Finance</div>
+        <div class="score" style="color:#D9822B;">44%</div>
+        <div class="level" style="color:#D9822B;">Faible</div>
+        <div class="arrow">Voir le détail →</div>
+      </div>
+      <div class="demo-card reveal reveal-d2">
+        <div class="sector">COMMERCE</div>
+        <div class="name">PME Commerce</div>
+        <div class="score" style="color:#D24A2E;">20%</div>
+        <div class="level" style="color:#D24A2E;">Critique</div>
+        <div class="arrow">Voir le détail →</div>
+      </div>
+      <div class="demo-card reveal reveal-d3">
+        <div class="sector">TECHNOLOGIE</div>
+        <div class="name">PME Technologie</div>
+        <div class="score" style="color:#0A7D68;">83%</div>
+        <div class="level" style="color:#0A7D68;">Avancé</div>
+        <div class="arrow">Voir le détail →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final" id="start">
+  <div class="container">
+    <div class="eyebrow reveal">COMMENCER</div>
+    <h2 class="reveal reveal-d1">Douze minutes pour savoir où vous en êtes vraiment.</h2>
+    <a href="#" class="btn-primary reveal reveal-d2">Commencer l'évaluation</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container foot-row">
+    <div style="display:flex; align-items:center;">
+      <svg width="20" height="20" viewBox="0 0 100 100" id="footLogo" style="margin-right:10px;"></svg>
+      <span class="logo">Penta<span style="color:var(--emerald);">score</span></span>
+    </div>
+    <span class="meta">par CMRPI — Espace Maroc Cyberconfiance — Kénitra, Maroc</span>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// Géométrie pentagone (réutilisée hero + section domaines)
+// ============================================================
+function pentPoints(cx, cy, r){
+  const pts = [];
+  for(let i=0;i<5;i++){
+    const a = -Math.PI/2 + i*(2*Math.PI/5);
+    pts.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
+  }
+  return pts;
+}
+
+function logoSVG(strokeColor, fillColor){
+  const cx=50, cy=52, outerR=42;
+  const outer = pentPoints(cx, cy, outerR);
+  const outerStr = outer.map(p=>p.join(',')).join(' ');
+  const ratios = [0.55, 0.85, 0.4, 0.7, 0.5];
+  const inner = pentPoints(cx, cy, outerR).map((p,i)=>{
+    return [cx + (p[0]-cx)*ratios[i], cy + (p[1]-cy)*ratios[i]];
+  });
+  const innerStr = inner.map(p=>p.join(',')).join(' ');
+  return `<polygon points="${outerStr}" fill="none" stroke="${strokeColor}" stroke-width="5" stroke-linejoin="round"/>
+          <polygon points="${innerStr}" fill="${fillColor}" fill-opacity="0.85"/>`;
+}
+
+function buildHero(){
+  const svg = document.getElementById('heroSvg');
+  const cx=210, cy=210, maxR=150;
+  const scores = [50,55,35,50,30];
+  let html = '';
+  [0.25,0.5,0.75,1.0].forEach(r=>{
+    const p = pentPoints(cx,cy,maxR*r);
+    html += `<polygon points="${p.map(x=>x.join(',')).join(' ')}" fill="none" stroke="rgba(16,32,47,0.13)" stroke-width="1"/>`;
+  });
+  pentPoints(cx,cy,maxR).forEach(p=>{
+    html += `<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="rgba(16,32,47,0.13)" stroke-width="1"/>`;
+  });
+  const final = pentPoints(cx,cy,maxR).map((p,i)=>{
+    const ratio = scores[i]/100;
+    return [cx+(p[0]-cx)*ratio, cy+(p[1]-cy)*ratio];
+  });
+  const finalStr = final.map(p=>p.join(',')).join(' ');
+  html += `<polygon points="${finalStr}" fill="#0A7D68" fill-opacity="0.16" stroke="#0A7D68" stroke-width="2" class="pent-fill"/>`;
+  final.forEach(p=>{ html += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#0A7D68"/>`; });
+  svg.innerHTML = html;
+}
+
+function buildDomainPentagon(){
+  const svg = document.getElementById('domPentagon');
+  const cx=200, cy=200, maxR=150;
+  const labels = ['GOUV.','ACCÈS','INFRA.','INCID.','SENSIB.'];
+  let html = '';
+  [0.33,0.66,1.0].forEach(r=>{
+    const p = pentPoints(cx,cy,maxR*r);
+    html += `<polygon points="${p.map(x=>x.join(',')).join(' ')}" fill="none" stroke="rgba(16,32,47,0.13)" stroke-width="1"/>`;
+  });
+  pentPoints(cx,cy,maxR).forEach((p,i)=>{
+    html += `<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="rgba(16,32,47,0.13)" stroke-width="1"/>`;
+    const lp = pentPoints(cx,cy,maxR*1.16)[i];
+    html += `<text x="${lp[0]}" y="${lp[1]}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="rgba(16,32,47,0.55)">${labels[i]}</text>`;
+  });
+  const inner = pentPoints(cx,cy,maxR*0.62);
+  html += `<polygon points="${inner.map(p=>p.join(',')).join(' ')}" fill="#0A7D68" fill-opacity="0.10" stroke="#0A7D68" stroke-width="1.5"/>`;
+  svg.innerHTML = html;
+}
+
+// ============================================================
+// Compteurs animés (déclenchés au scroll)
+// ============================================================
+function animateCounter(el){
+  if(el.dataset.done) return;
+  el.dataset.done = '1';
+  const target = parseInt(el.dataset.count, 10);
+  const dur = 1200;
+  const t0 = performance.now();
+  function tick(t){
+    const p = Math.min(1, (t-t0)/dur);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(target*eased);
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ============================================================
+// Reveal au scroll (IntersectionObserver, avec repli sûr)
+// ============================================================
+function initReveal(){
+  const items = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    items.forEach(el=>{
+      el.classList.add('in');
+      const counter = el.querySelector('[data-count]');
+      if(counter) animateCounter(counter);
+    });
+    return;
+  }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        const counter = entry.target.querySelector('[data-count]');
+        if(counter) animateCounter(counter);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  items.forEach(el=> io.observe(el));
+}
+
+buildHero();
+buildDomainPentagon();
+document.getElementById('navLogo').innerHTML = logoSVG('#10202F', '#0A7D68');
+document.getElementById('footLogo').innerHTML = logoSVG('#10202F', '#0A7D68');
+initReveal();
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+.history {
+  padding-top: 52px;
+  padding-bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+.history-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 56ch;
+}
+
+.history-head h1 {
+  font-size: clamp(28px, 3.4vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.history-chart {
+  position: relative;
+  margin: 0;
+  padding-bottom: 28px;
+}
+
+.history-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart-grid {
+  stroke: rgba(16, 32, 47, 0.1);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--color-emerald);
+  stroke-width: 2;
+}
+
+.chart-dot {
+  fill: var(--color-emerald);
+}
+
+.chart-axis,
+.chart-value,
+.chart-date {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.chart-axis {
+  left: 0;
+  transform: translateY(-50%);
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--color-ink-42);
+}
+
+.chart-value {
+  transform: translate(-50%, -100%);
+  font-family: var(--font-data);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chart-date {
+  bottom: 0;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--color-ink-55);
+}
+
+.history-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 64px 96px 64px;
+  gap: 20px;
+  align-items: baseline;
+  padding: 18px 0;
+  border-top: 1px solid var(--color-rule);
+  font-size: 15px;
+}
+
+.history-note {
+  font-size: 14px;
+  color: var(--color-ink-62);
+}
+
+.history-score {
+  font-size: 16px;
+  text-align: right;
+}
+
+.history-level {
+  font-size: 13px;
+  text-align: right;
+}
+
+.history-delta {
+  font-size: 13px;
+  text-align: right;
+  color: var(--color-ink-55);
+}
+
+.history-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-rule-strong);
+}
+
+.delete-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--color-coral);
+}
+
+.btn-danger {
+  background: var(--color-coral);
+  color: var(--color-paper);
+  border: none;
+  padding: 9px 18px;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .history-row {
+    grid-template-columns: minmax(0, 1fr) 48px 80px;
+  }
+
+  .history-note,
+  .history-delta {
+    display: none;
+  }
+
+  .chart-date {
+    display: none;
+  }
+}

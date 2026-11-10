@@ -1,0 +1,51 @@
+.penta-radar {
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+.penta-radar svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.radar-ring {
+  fill: none;
+  stroke: rgba(16, 32, 47, 0.13);
+  stroke-width: 1;
+}
+
+.radar-shape {
+  fill: var(--color-emerald);
+  fill-opacity: 0.16;
+  stroke: var(--color-emerald);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.radar-dot {
+  fill: var(--color-emerald);
+}
+
+.radar-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  font-family: var(--font-data);
+}
+
+.radar-label-name {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-55);
+}
+
+.radar-label-value {
+  font-size: 14px;
+  font-weight: 600;
+}

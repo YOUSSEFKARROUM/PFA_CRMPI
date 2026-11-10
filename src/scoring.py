@@ -84,7 +84,95 @@ def generate_recommendations(domain_scores: dict, get_recs_fn) -> dict:
     return result
 
 
-def generate_top_recommendations(domain_scores: dict, get_recs_fn, limit: int = 3) -> list:
+LIKERT_MIN, LIKERT_MAX = 1, 5
+
+
+def get_score_contributions(responses: dict, question_domain_map: dict) -> list:
+    """
+    Replay du score : points perdus par chaque réponse sur le score global (0-100).
+
+    Fonction pure, cohérente avec calculate_domain_score / calculate_global_score :
+    une question pèse 100 / (nb de domaines × nb de questions du domaine) points,
+    répartis sur les 4 crans de l'échelle de réponse. Avec 5 domaines de 5 questions,
+    chaque cran vaut 1 point : une réponse à 1 coûte 4 points, une réponse à 5 n'en coûte aucun.
+    La somme des points perdus vaut donc 100 - score global (aux arrondis près).
+
+    returns: [{question_id, domain_id, value, points_lost}], de la réponse la plus
+             pénalisante à la moins pénalisante (ordre du questionnaire en cas d'égalité).
+    """
+    answered = [(qid, domain_id) for qid, domain_id in question_domain_map.items() if qid in responses]
+    domains = {domain_id for _, domain_id in answered}
+    questions_per_domain = {d: sum(1 for _, domain_id in answered if domain_id == d) for d in domains}
+    steps = LIKERT_MAX - LIKERT_MIN
+
+    contributions = [
+        {
+            "question_id": qid,
+            "domain_id": domain_id,
+            "value": responses[qid],
+            "points_lost": round(
+                (LIKERT_MAX - responses[qid]) / steps * 100 / len(domains) / questions_per_domain[domain_id], 2
+            ),
+        }
+        for qid, domain_id in answered
+    ]
+    order = {qid: index for index, (qid, _) in enumerate(answered)}
+    return sorted(contributions, key=lambda c: (-c["points_lost"], order[c["question_id"]]))
+
+
+SEVERITY_RANK = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+MAX_RECOMMENDATIONS_PER_DOMAIN = 2
+
+
+def recommendation_applies(recommendation: dict, responses: dict) -> bool:
+    """
+    Une recommandation liée à une question ne s'applique que si la réponse est
+    inférieure ou égale à son seuil (trigger_max). Une recommandation générale
+    (sans question) s'applique toujours.
+    """
+    question_id = recommendation.get("question_id")
+    if question_id is None:
+        return True
+    answer = responses.get(question_id)
+    return answer is not None and answer <= recommendation["trigger_max"]
+
+
+def _answer_gap(recommendation: dict, responses: dict) -> int:
+    question_id = recommendation.get("question_id")
+    return recommendation["trigger_max"] - responses[question_id] if question_id else 0
+
+
+def _pick_diverse(candidates: list, limit: int) -> list:
+    """
+    Trois passes, dans l'ordre de priorité des candidats :
+    1. au plus MAX_RECOMMENDATIONS_PER_DOMAIN par domaine et une seule par question ;
+    2. une seule par question, sans plafond de domaine ;
+    3. complément libre si la limite n'est toujours pas atteinte.
+    """
+    picked = []
+
+    def run_pass(is_allowed) -> None:
+        for candidate in candidates:
+            if len(picked) == limit:
+                return
+            if candidate not in picked and is_allowed(candidate):
+                picked.append(candidate)
+
+    def new_question(candidate: dict) -> bool:
+        question_id = candidate.get("question_id")
+        return question_id is None or all(p.get("question_id") != question_id for p in picked)
+
+    def domain_has_room(candidate: dict) -> bool:
+        same_domain = sum(1 for p in picked if p["domain_id"] == candidate["domain_id"])
+        return same_domain < MAX_RECOMMENDATIONS_PER_DOMAIN
+
+    run_pass(lambda c: new_question(c) and domain_has_room(c))
+    run_pass(new_question)
+    run_pass(lambda c: True)
+    return picked
+
+
+def generate_top_recommendations(domain_scores: dict, get_recs_fn, limit: int = 3, responses: dict = None) -> list:
     """
     Sélectionne un total global de `limit` recommandations (2-3, conformément au
     brief Jalon 3 : "score + 2-3 recommandations selon les réponses faibles"),
@@ -94,31 +182,43 @@ def generate_top_recommendations(domain_scores: dict, get_recs_fn, limit: int = 
     que des pistes d'optimisation Medium/Low — jamais une alerte "Haute" sur un
     domaine déjà maîtrisé.
 
+    Avec `responses` ({question_id: valeur}), la sélection est pilotée par les
+    réponses : une recommandation liée à une question n'est retenue que si la
+    réponse est <= son seuil (on ne recommande jamais une pratique déjà déclarée),
+    les recommandations générales passent après, et la diversité est assurée
+    (une par question, au plus MAX_RECOMMENDATIONS_PER_DOMAIN par domaine).
+
     domain_scores: {domain_id: score, ...}
     get_recs_fn: fonction(domain_id, severities) -> liste de recommandations (depuis la DB)
     returns: liste plate de recommandations (chacune enrichie de sa clé "domain_id"),
              de longueur <= limit
     """
-    severity_rank = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
     weakest_order = [d for d, _ in sorted(domain_scores.items(), key=lambda kv: kv[1])]
     domain_rank = {domain_id: i for i, domain_id in enumerate(weakest_order)}
 
     candidates = []
     for domain_id in weakest_order:
         severities, _ = get_severity_filter(domain_scores[domain_id])
-        recs = get_recs_fn(domain_id, severities)
-        for r in recs:
-            r_with_domain = dict(r)
-            r_with_domain["domain_id"] = domain_id
-            candidates.append(r_with_domain)
+        for r in get_recs_fn(domain_id, severities):
+            if responses is None or recommendation_applies(r, responses):
+                candidates.append({**r, "domain_id": domain_id})
+
+    if responses is None:
+        candidates.sort(key=lambda r: (
+            domain_rank[r["domain_id"]],
+            SEVERITY_RANK.get(r.get("severity"), 9),
+            r.get("priority", 99),
+        ))
+        return candidates[:limit]
 
     candidates.sort(key=lambda r: (
+        r.get("question_id") is None,
         domain_rank[r["domain_id"]],
-        severity_rank.get(r.get("severity"), 9),
+        SEVERITY_RANK.get(r.get("severity"), 9),
+        -_answer_gap(r, responses),
         r.get("priority", 99),
     ))
-
-    return candidates[:limit]
+    return _pick_diverse(candidates, limit)
 
 
 def score_full_audit(all_responses: dict) -> dict:

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html { scroll-behavior:smooth; }
+  html, body { margin:0; padding:0; background:#FAF8F2; color:#10202F; font-family:Inter, system-ui, sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  * { box-sizing:border-box; }
+  a { color:#0A7D68; text-decoration:none; }
+  a:hover { color:#095C4D; }
+  input, select, button { font-family:inherit; font-size:inherit; color:inherit; }
+</style>
+</helmet>
+
+<div style="background:#FAF8F2; min-height:100vh;">
+
+  <div style="position:sticky; top:0; z-index:50; background:rgba(250,248,242,0.90); backdrop-filter:blur(8px); border-bottom:1px solid rgba(16,32,47,0.12);">
+    <div style="max-width:1120px; margin:0 auto; padding:18px clamp(20px,6vw,64px); display:flex; align-items:center; justify-content:space-between; gap:24px;">
+      <button onClick="{{ goLanding }}" style="display:flex; align-items:center; gap:12px; background:transparent; border:none; padding:0; cursor:pointer;">
+        <svg width="26" height="26" viewBox="0 0 100 100" style="flex-shrink:0; display:block;">
+          <polygon points="{{ logoOuter }}" fill="none" stroke="#10202F" stroke-width="5" stroke-linejoin="round"></polygon>
+          <polygon points="{{ logoInner }}" fill="#0A7D68" fill-opacity="0.85"></polygon>
+        </svg>
+        <span style="font-family:Fraunces,serif; font-weight:600; font-size:19px; letter-spacing:-0.01em;">Penta<span style="color:#0A7D68;">score</span></span>
+      </button>
+      <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:32px;">
+          <a href="#domains" style="font-size:14px; color:rgba(16,32,47,0.62);">Domaines</a>
+          <a href="#how" style="font-size:14px; color:rgba(16,32,47,0.62);">Méthode</a>
+          <a href="#demos" style="font-size:14px; color:rgba(16,32,47,0.62);">Démonstration</a>
+          <button onClick="{{ goStart }}" style="background:#10202F; color:#FAF8F2; border:none; cursor:pointer; padding:9px 20px; font-size:13.5px; font-weight:500;" style-hover="background:#0A7D68;">Commencer</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:center; gap:26px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.06em; color:rgba(16,32,47,0.55);">{{ stepLabel }}</span>
+          <button onClick="{{ goLanding }}" style="background:transparent; border:1px solid rgba(16,32,47,0.20); cursor:pointer; padding:8px 18px; font-size:13.5px;" style-hover="border-color:#10202F;">Quitter</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="max-width:1120px; margin:0 auto; padding:clamp(56px,10vh,104px) clamp(20px,6vw,64px) clamp(48px,8vh,84px); display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:clamp(28px,5vw,64px); align-items:center;">
+        <div style="display:flex; flex-direction:column; gap:26px;">
+          <div style="display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">
+            <span style="width:20px; height:1px; background:#0A7D68; display:inline-block;"></span>CMRPI · Espace Maroc Cyberconfiance
+          </div>
+          <h1 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(38px,4.6vw,60px); line-height:1.06; letter-spacing:-0.02em; margin:0; text-wrap:pretty;">Où en est réellement la sécurité numérique <span style="color:#0A7D68;">de votre entreprise</span>&nbsp;?</h1>
+          <p style="margin:0; font-size:17.5px; line-height:1.65; color:rgba(16,32,47,0.62); max-width:46ch;">25 questions, 5 domaines, environ 12 minutes. À la fin&nbsp;: un score de maturité, le détail domaine par domaine, et deux à trois actions prioritaires. Aucun prérequis technique.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:14px; padding-top:6px;">
+            <button onClick="{{ goStart }}" style="background:#0A7D68; color:#FAF8F2; border:none; cursor:pointer; padding:16px 32px; font-size:16px; font-weight:500;" style-hover="background:#095C4D;">Commencer l'évaluation</button>
+            <a href="#demos" style="border:1px solid rgba(16,32,47,0.12); color:#10202F; padding:15px 28px; font-size:15px; font-weight:500;" style-hover="border-color:#10202F;">Voir un exemple</a>
+          </div>
+        </div>
+        <svg viewBox="0 0 420 420" style="width:100%; height:auto; display:block;">
+          <sc-for list="{{ heroRings }}" as="r" hint-placeholder-count="4">
+            <polygon points="{{ r.points }}" fill="none" stroke="rgba(16,32,47,0.13)" stroke-width="1"></polygon>
+          </sc-for>
+          <sc-for list="{{ heroSpokes }}" as="s" hint-placeholder-count="5">
+            <line x1="210" y1="210" x2="{{ s.x }}" y2="{{ s.y }}" stroke="rgba(16,32,47,0.13)" stroke-width="1"></line>
+          </sc-for>
+          <polygon points="{{ heroShape }}" fill="#0A7D68" fill-opacity="0.16" stroke="#0A7D68" stroke-width="2"></polygon>
+          <sc-for list="{{ heroPoints }}" as="p" hint-placeholder-count="5">
+            <circle cx="{{ p.x }}" cy="{{ p.y }}" r="4" fill="#0A7D68"></circle>
+          </sc-for>
+        </svg>
+      </div>
+
+      <div style="border-top:1px solid rgba(16,32,47,0.12); border-bottom:1px solid rgba(16,32,47,0.12);">
+        <div style="max-width:1120px; margin:0 auto; padding:56px clamp(20px,6vw,64px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:40px;">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="font-family:Fraunces,serif; font-weight:600; font-size:clamp(36px,4vw,54px); line-height:1;">{{ s.value }}<span style="color:#A9824C;">{{ s.suffix }}</span></div>
+              <div style="font-size:14.5px; line-height:1.5; color:rgba(16,32,47,0.62); max-width:26ch;">{{ s.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(16,32,47,0.42);">{{ s.source }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div id="domains" style="max-width:1120px; margin:0 auto; padding:clamp(64px,10vh,116px) clamp(20px,6vw,64px);">
+        <div style="max-width:640px; margin-bottom:52px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">
+            <span style="width:20px; height:1px; background:#0A7D68; display:inline-block;"></span>La méthode
+          </div>
+          <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); letter-spacing:-0.01em; margin:0; line-height:1.12;">Cinq domaines, alignés sur les référentiels internationaux</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr); gap:clamp(28px,5vw,60px); align-items:center;">
+          <div style="position:relative; width:100%;">
+            <svg viewBox="0 0 400 400" style="width:100%; height:auto; display:block;">
+              <sc-for list="{{ domRings }}" as="r" hint-placeholder-count="3">
+                <polygon points="{{ r.points }}" fill="none" stroke="rgba(16,32,47,0.13)" stroke-width="1"></polygon>
+              </sc-for>
+              <sc-for list="{{ domSpokes }}" as="s" hint-placeholder-count="5">
+                <line x1="200" y1="200" x2="{{ s.x }}" y2="{{ s.y }}" stroke="rgba(16,32,47,0.13)" stroke-width="1"></line>
+              </sc-for>
+              <polygon points="{{ domInner }}" fill="#0A7D68" fill-opacity="0.10" stroke="#0A7D68" stroke-width="1.5"></polygon>
+            </svg>
+            <sc-for list="{{ domLabels }}" as="l" hint-placeholder-count="5">
+              <span style="position:absolute; left:{{ l.left }}; top:{{ l.top }}; transform:translate(-50%,-50%); white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.04em; color:rgba(16,32,47,0.55);">{{ l.text }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ domainList }}" as="d" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:32px minmax(0,1fr); gap:8px; padding:22px 0; border-bottom:1px solid rgba(16,32,47,0.12);">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#0A7D68; padding-top:3px;">{{ d.num }}</span>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <span style="font-family:Fraunces,serif; font-size:19px; font-weight:500;">{{ d.name }}</span>
+                  <span style="font-size:14.5px; line-height:1.5; color:rgba(16,32,47,0.62);">{{ d.desc }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div id="how" style="background:#F1EEE3;">
+        <div style="max-width:1120px; margin:0 auto; padding:clamp(64px,10vh,116px) clamp(20px,6vw,64px);">
+          <div style="max-width:640px; margin-bottom:52px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">
+              <span style="width:20px; height:1px; background:#0A7D68; display:inline-block;"></span>En pratique
+            </div>
+            <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); letter-spacing:-0.01em; margin:0; line-height:1.12;">Trois étapes, aucune installation</h2>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:36px;">
+            <div style="display:flex; flex-direction:column; gap:0;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#A9824C; margin-bottom:16px;">01 / RÉPONDRE</div>
+              <h3 style="font-family:Fraunces,serif; font-size:20px; font-weight:500; margin:0 0 10px;">Questionnaire clair</h3>
+              <p style="margin:0 0 18px; font-size:14.5px; line-height:1.6; color:rgba(16,32,47,0.62);">Au choix, par domaine ou question par question. Chaque question a son explication.</p>
+              <div style="background:#FAF8F2; border:1px solid rgba(16,32,47,0.12); padding:16px 18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.7; color:rgba(16,32,47,0.62);">Q07 — Accès &amp; Identités<br>&gt; <span style="color:#0A7D68; font-weight:600;">4 — Plutôt oui</span></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#A9824C; margin-bottom:16px;">02 / CALCULER</div>
+              <h3 style="font-family:Fraunces,serif; font-size:20px; font-weight:500; margin:0 0 10px;">Score automatique</h3>
+              <p style="margin:0 0 18px; font-size:14.5px; line-height:1.6; color:rgba(16,32,47,0.62);">Un score par domaine et un score global, calculés instantanément selon une formule vérifiable.</p>
+              <div style="background:#FAF8F2; border:1px solid rgba(16,32,47,0.12); padding:16px 18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.7; color:rgba(16,32,47,0.62);">Gouvernance <span style="color:#0A7D68; font-weight:600;">50 — Moyenne</span><br>Sensibilisation <span style="color:#D24A2E; font-weight:600;">30 — Faible</span></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#A9824C; margin-bottom:16px;">03 / AGIR</div>
+              <h3 style="font-family:Fraunces,serif; font-size:20px; font-weight:500; margin:0 0 10px;">Recommandations ciblées</h3>
+              <p style="margin:0 0 18px; font-size:14.5px; line-height:1.6; color:rgba(16,32,47,0.62);">2 à 3 actions prioritaires, choisies selon vos domaines les plus faibles — pas une liste générique.</p>
+              <div style="background:#FAF8F2; border:1px solid rgba(16,32,47,0.12); padding:16px 18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.7; color:rgba(16,32,47,0.62);"><span style="color:#D24A2E; font-weight:600;">[Haute]</span> Sensibilisation annuelle des équipes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="demos" style="max-width:1120px; margin:0 auto; padding:clamp(64px,10vh,116px) clamp(20px,6vw,64px);">
+        <div style="max-width:640px; margin-bottom:52px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">
+            <span style="width:20px; height:1px; background:#0A7D68; display:inline-block;"></span>Démonstration
+          </div>
+          <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(30px,3.2vw,42px); letter-spacing:-0.01em; margin:0; line-height:1.12;">Trois profils réels, trois résultats différents</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px;">
+          <sc-for list="{{ demoProfiles }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.onClick }}" style="text-align:left; background:transparent; border:1px solid rgba(16,32,47,0.12); cursor:pointer; padding:28px 26px; display:flex; flex-direction:column; gap:0;" style-hover="border-color:#10202F;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:rgba(16,32,47,0.42); margin-bottom:14px;">{{ p.sector }}</span>
+              <span style="font-family:Fraunces,serif; font-size:21px; font-weight:500; margin-bottom:20px;">{{ p.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:44px; font-weight:600; line-height:1; color:{{ p.color }};">{{ p.score }}</span>
+              <span style="font-size:13.5px; margin-top:8px; font-weight:500; color:{{ p.color }};">{{ p.level }}</span>
+              <span style="font-size:13.5px; margin-top:20px; color:rgba(16,32,47,0.62);">Voir le détail →</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background:#10202F; color:#FAF8F2;">
+        <div style="max-width:1120px; margin:0 auto; padding:clamp(64px,10vh,104px) clamp(20px,6vw,64px); display:flex; flex-direction:column; align-items:center; gap:18px; text-align:center;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">Commencer</span>
+          <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(32px,4.2vw,54px); letter-spacing:-0.02em; margin:0; max-width:760px; line-height:1.1;">Douze minutes pour savoir où vous en êtes vraiment.</h2>
+          <button onClick="{{ goStart }}" style="margin-top:12px; background:#FAF8F2; color:#10202F; border:none; cursor:pointer; padding:16px 32px; font-size:16px; font-weight:500;" style-hover="background:#0A7D68; color:#FAF8F2;">Commencer l'évaluation</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isStart }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1120px; margin:0 auto; padding:clamp(44px,7vh,80px) clamp(20px,6vw,64px) 88px; display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:clamp(32px,6vw,80px); align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:26px;">
+        <div style="display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#0A7D68;">
+          <span style="width:20px; height:1px; background:#0A7D68; display:inline-block;"></span>Avant de commencer
+        </div>
+        <h1 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(32px,3.8vw,48px); line-height:1.08; letter-spacing:-0.02em; margin:0;">Deux informations, puis vous répondez.</h1>
+        <p style="margin:0; font-size:16.5px; line-height:1.6; color:rgba(16,32,47,0.62); max-width:44ch;">Elles servent à situer votre score par rapport à votre secteur. Aucune donnée n'est transmise à un tiers.</p>
+
+        <div style="display:flex; flex-direction:column; gap:24px; max-width:520px; padding-top:6px;">
+          <label style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55);">Organisation (facultatif)</span>
+            <input type="text" value="{{ orgName }}" onChange="{{ onOrgChange }}" placeholder="Nom de votre entreprise" style="border:none; border-bottom:1px solid rgba(16,32,47,0.28); background:transparent; padding:10px 0; font-size:17px; outline:none;" style-focus="border-bottom-color:#0A7D68;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55);">Secteur d'activité</span>
+            <select value="{{ sector }}" onChange="{{ onSectorChange }}" style="border:none; border-bottom:1px solid rgba(16,32,47,0.28); background:transparent; padding:10px 0; font-size:17px; outline:none; appearance:none;" style-focus="border-bottom-color:#0A7D68;">
+              <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="5">
+                <option value="{{ s }}">{{ s }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55);">Déroulé du questionnaire</span>
+            <div style="display:flex; border:1px solid rgba(16,32,47,0.20);">
+              <sc-for list="{{ modeOptions }}" as="m" hint-placeholder-count="2">
+                <button onClick="{{ m.onClick }}" style="flex:1; border:none; cursor:pointer; text-align:left; padding:14px 16px; display:flex; flex-direction:column; gap:3px; background:{{ m.bg }}; color:{{ m.fg }};">
+                  <span style="font-size:15px; font-weight:500;">{{ m.title }}</span>
+                  <span style="font-size:12.5px; opacity:0.72;">{{ m.detail }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ startAudit }}" style="align-self:flex-start; margin-top:6px; background:#0A7D68; color:#FAF8F2; border:none; cursor:pointer; padding:16px 32px; font-size:16px; font-weight:500;" style-hover="background:#095C4D;">Commencer l'évaluation</button>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0; border-top:1px solid rgba(16,32,47,0.20); margin-top:44px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55); padding:18px 0 4px;">Ou charger un profil de démonstration</span>
+        <sc-for list="{{ demoProfiles }}" as="p" hint-placeholder-count="3">
+          <button onClick="{{ p.onClick }}" style="display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 16px; background:transparent; border:none; border-bottom:1px solid rgba(16,32,47,0.12); cursor:pointer; padding:16px 0; text-align:left;" style-hover="background:rgba(10,125,104,0.06);">
+            <span style="font-size:15.5px;">{{ p.name }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:{{ p.color }}; text-align:right;">{{ p.score }}</span>
+            <span style="font-size:13px; color:rgba(16,32,47,0.55);">{{ p.sector }}</span>
+            <span style="font-size:13px; color:{{ p.color }}; text-align:right;">{{ p.level }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1120px; margin:0 auto; padding:44px clamp(20px,6vw,64px) 88px; display:grid; grid-template-columns:190px minmax(0,1fr); gap:clamp(28px,5vw,72px); align-items:start;">
+      <div style="position:sticky; top:100px; display:flex; flex-direction:column; gap:20px;">
+        <svg viewBox="0 0 140 136" style="width:140px; height:auto; display:block;">
+          <polygon points="{{ navOutline }}" fill="none" stroke="rgba(16,32,47,0.16)" stroke-width="1"></polygon>
+          <polyline points="{{ navProgressPath }}" fill="none" stroke="#0A7D68" stroke-width="2"></polyline>
+          <sc-for list="{{ navDots }}" as="d" hint-placeholder-count="5">
+            <circle cx="{{ d.x }}" cy="{{ d.y }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="2"></circle>
+          </sc-for>
+        </svg>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <sc-for list="{{ navLabels }}" as="l" hint-placeholder-count="5">
+            <span style="font-size:13px; line-height:1.35; color:{{ l.color }}; font-weight:{{ l.weight }};">{{ l.name }}</span>
+          </sc-for>
+        </div>
+        <div style="padding-top:14px; border-top:1px solid rgba(16,32,47,0.12); font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:rgba(16,32,47,0.55);">{{ answeredLabel }}</div>
+      </div>
+
+      <div style="max-width:700px; display:flex; flex-direction:column; gap:34px;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.06em; color:#0A7D68;">{{ quizCounter }}</span>
+          <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(28px,3.2vw,40px); line-height:1.12; letter-spacing:-0.015em; margin:0;">{{ quizTitle }}</h2>
+          <p style="margin:0; font-size:15.5px; line-height:1.6; color:rgba(16,32,47,0.62); max-width:52ch;">{{ quizIntro }}</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <sc-for list="{{ visibleQuestions }}" as="q" hint-placeholder-count="5">
+            <div style="display:flex; flex-direction:column; gap:14px; padding:0 0 34px; margin-bottom:34px; border-bottom:1px solid rgba(16,32,47,0.12);">
+              <div style="display:grid; grid-template-columns:34px minmax(0,1fr); gap:8px; align-items:baseline;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:rgba(16,32,47,0.42);">{{ q.num }}</span>
+                <p style="margin:0; font-size:{{ q.size }}; line-height:1.45; font-weight:500; max-width:46ch;">{{ q.text }}</p>
+              </div>
+              <div style="padding-left:42px; display:flex; flex-direction:column; gap:12px;">
+                <button onClick="{{ q.toggleGuidance }}" style="align-self:flex-start; background:transparent; border:none; padding:0; cursor:pointer; font-size:13px; color:#0A7D68; text-align:left;" style-hover="text-decoration:underline;">{{ q.guidanceLabel }}</button>
+                <sc-if value="{{ q.guidanceOpen }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:0; font-size:14px; line-height:1.6; color:rgba(16,32,47,0.70); border-left:2px solid rgba(169,130,76,0.55); padding-left:14px; max-width:52ch;">{{ q.guidance }}</p>
+                </sc-if>
+                <div style="display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px;">
+                  <sc-for list="{{ q.choices }}" as="c" hint-placeholder-count="5">
+                    <button onClick="{{ c.onClick }}" style="cursor:pointer; padding:11px 8px 12px; text-align:left; display:flex; flex-direction:column; gap:6px; background:{{ c.bg }}; color:{{ c.fg }}; border:1px solid {{ c.border }};" style-hover="border-color:#0A7D68;">
+                      <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.8;">{{ c.value }}</span>
+                      <span style="font-size:12.5px; line-height:1.3;">{{ c.label }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:24px;">
+          <button onClick="{{ goNext }}" style="background:{{ nextBg }}; color:#FAF8F2; border:none; cursor:pointer; padding:16px 32px; font-size:16px; font-weight:500;" style-hover="background:#095C4D;">{{ nextLabel }}</button>
+          <button onClick="{{ goBack }}" style="background:transparent; border:none; cursor:pointer; font-size:14px; color:rgba(16,32,47,0.60); padding:0;" style-hover="color:#10202F;">{{ backLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1120px; margin:0 auto; padding:52px clamp(20px,6vw,64px) 96px; display:flex; flex-direction:column; gap:72px;">
+      <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,0.9fr); gap:clamp(32px,6vw,80px); align-items:center;">
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55);">{{ resultHeader }}</span>
+          <div style="display:flex; align-items:baseline; gap:12px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:clamp(84px,12vw,148px); line-height:0.86; letter-spacing:-0.03em;">{{ animatedScore }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:26px; color:rgba(16,32,47,0.42);">/100</span>
+          </div>
+          <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(28px,3.4vw,42px); line-height:1.1; margin:0; letter-spacing:-0.015em; color:{{ maturityColor }};">Maturité {{ maturityLevel }}</h2>
+          <p style="margin:0; font-size:16.5px; line-height:1.6; color:rgba(16,32,47,0.70); max-width:44ch;">{{ maturitySummary }}</p>
+        </div>
+        <div style="position:relative; width:100%;">
+          <svg viewBox="0 0 400 380" style="width:100%; height:auto; display:block;">
+            <sc-for list="{{ radarRings }}" as="r" hint-placeholder-count="4">
+              <polygon points="{{ r.points }}" fill="none" stroke="rgba(16,32,47,0.12)" stroke-width="1"></polygon>
+            </sc-for>
+            <sc-for list="{{ radarSpokes }}" as="s" hint-placeholder-count="5">
+              <line x1="200" y1="185" x2="{{ s.x }}" y2="{{ s.y }}" stroke="rgba(16,32,47,0.12)" stroke-width="1"></line>
+            </sc-for>
+            <polygon points="{{ radarShape }}" fill="#0A7D68" fill-opacity="0.16" stroke="#0A7D68" stroke-width="2"></polygon>
+            <sc-for list="{{ radarPoints }}" as="p" hint-placeholder-count="5">
+              <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.5" fill="#0A7D68"></circle>
+            </sc-for>
+          </svg>
+          <sc-for list="{{ radarLabels }}" as="l" hint-placeholder-count="5">
+            <div style="position:absolute; left:{{ l.left }}; top:{{ l.top }}; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:2px; white-space:nowrap;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.04em; color:rgba(16,32,47,0.55);">{{ l.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:{{ l.color }};">{{ l.score }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid rgba(16,32,47,0.20);">
+          <h3 style="font-family:Fraunces,serif; font-weight:500; font-size:22px; margin:0;">Détail par domaine</h3>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(16,32,47,0.42);">score · niveau</span>
+        </div>
+        <sc-for list="{{ domainRows }}" as="d" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 64px 104px; gap:20px; align-items:center; padding:18px 0; border-bottom:1px solid rgba(16,32,47,0.12);">
+            <span style="font-size:15.5px;">{{ d.name }}</span>
+            <div style="height:3px; background:rgba(16,32,47,0.10); position:relative;">
+              <div style="position:absolute; left:0; top:0; bottom:0; width:{{ d.width }}; background:{{ d.color }};"></div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:16px; text-align:right;">{{ d.score }}</span>
+            <span style="font-size:13px; text-align:right; color:{{ d.color }};">{{ d.level }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid; grid-template-columns:minmax(0,0.8fr) minmax(0,2fr); gap:clamp(28px,5vw,72px); align-items:start;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <h3 style="font-family:Fraunces,serif; font-weight:500; font-size:22px; margin:0;">Vos priorités</h3>
+          <p style="margin:0; font-size:14px; line-height:1.6; color:rgba(16,32,47,0.62);">Trois actions à engager dans l'ordre. Elles portent sur les domaines qui pèsent le plus sur votre score global.</p>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <sc-for list="{{ recommendations }}" as="r" hint-placeholder-count="3">
+            <div style="display:grid; grid-template-columns:28px minmax(0,1fr) 116px; gap:20px; align-items:start; padding:22px 0; border-top:1px solid rgba(16,32,47,0.12);">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:rgba(16,32,47,0.42); padding-top:3px;">{{ r.rank }}</span>
+              <div style="display:flex; flex-direction:column; gap:7px;">
+                <p style="margin:0; font-size:17px; font-weight:500; line-height:1.35;">{{ r.title }}</p>
+                <p style="margin:0; font-size:14.5px; line-height:1.6; color:rgba(16,32,47,0.70); max-width:56ch;">{{ r.detail }}</p>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(16,32,47,0.50);">{{ r.domain }}</span>
+              </div>
+              <span style="justify-self:end; font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:{{ r.sevColor }}; border-left:2px solid {{ r.sevColor }}; padding-left:10px;">{{ r.severity }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:26px; padding-top:34px; border-top:1px solid rgba(16,32,47,0.20);">
+        <button onClick="{{ exportPdf }}" style="background:#0A7D68; color:#FAF8F2; border:none; cursor:pointer; padding:16px 32px; font-size:16px; font-weight:500;" style-hover="background:#095C4D;">Télécharger le rapport PDF</button>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#0A7D68;">{{ exportLabel }}</span>
+        <button onClick="{{ goHistory }}" style="margin-left:auto; background:transparent; border:none; cursor:pointer; font-size:14px; color:rgba(16,32,47,0.60); padding:0;" style-hover="color:#10202F;">Historique des audits</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1120px; margin:0 auto; padding:52px clamp(20px,6vw,64px) 96px; display:flex; flex-direction:column; gap:44px;">
+      <div style="display:flex; flex-direction:column; gap:14px; max-width:52ch;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(16,32,47,0.55);">Historique — {{ orgLabel }}</span>
+        <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:clamp(28px,3.4vw,42px); line-height:1.1; margin:0; letter-spacing:-0.015em;">Quatre évaluations depuis mars 2025</h2>
+        <p style="margin:0; font-size:16px; line-height:1.6; color:rgba(16,32,47,0.70);">{{ historySummary }}</p>
+      </div>
+
+      <div style="position:relative; width:100%;">
+        <svg viewBox="0 0 900 230" style="width:100%; height:auto; display:block;">
+          <sc-for list="{{ historyGrid }}" as="g" hint-placeholder-count="3">
+            <line x1="34" y1="{{ g.y }}" x2="900" y2="{{ g.y }}" stroke="rgba(16,32,47,0.10)" stroke-width="1"></line>
+          </sc-for>
+          <polyline points="{{ historyPath }}" fill="none" stroke="#0A7D68" stroke-width="2"></polyline>
+          <sc-for list="{{ historyPoints }}" as="p" hint-placeholder-count="4">
+            <circle cx="{{ p.x }}" cy="{{ p.y }}" r="4.5" fill="#0A7D68"></circle>
+          </sc-for>
+        </svg>
+        <sc-for list="{{ historyGrid }}" as="g" hint-placeholder-count="3">
+          <span style="position:absolute; left:0; top:{{ g.top }}; transform:translateY(-50%); font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(16,32,47,0.45);">{{ g.label }}</span>
+        </sc-for>
+        <sc-for list="{{ historyPoints }}" as="p" hint-placeholder-count="4">
+          <span style="position:absolute; left:{{ p.left }}; top:{{ p.scoreTop }}; transform:translate(-50%,-100%); white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:#10202F;">{{ p.score }}</span>
+        </sc-for>
+        <sc-for list="{{ historyPoints }}" as="p" hint-placeholder-count="4">
+          <span style="position:absolute; left:{{ p.left }}; bottom:0; transform:translateX(-50%); white-space:nowrap; font-size:12px; color:rgba(16,32,47,0.55);">{{ p.date }}</span>
+        </sc-for>
+      </div>
+
+      <div style="display:flex; flex-direction:column;">
+        <sc-for list="{{ historyRows }}" as="h" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:150px minmax(0,1fr) 80px 104px 72px; gap:20px; align-items:baseline; padding:18px 0; border-top:1px solid rgba(16,32,47,0.12);">
+            <span style="font-size:15px;">{{ h.date }}</span>
+            <span style="font-size:14px; color:rgba(16,32,47,0.62);">{{ h.note }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:16px; text-align:right;">{{ h.score }}</span>
+            <span style="font-size:13px; text-align:right; color:{{ h.color }};">{{ h.level }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:right; color:{{ h.deltaColor }};">{{ h.delta }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <button onClick="{{ goResults }}" style="align-self:flex-start; background:transparent; border:none; cursor:pointer; font-size:14px; color:rgba(16,32,47,0.60); padding:0;" style-hover="color:#10202F;">Retour aux résultats</button>
+    </div>
+  </sc-if>
+
+  <div style="border-top:1px solid rgba(16,32,47,0.12);">
+    <div style="max-width:1120px; margin:0 auto; padding:40px clamp(20px,6vw,64px); display:flex; flex-wrap:wrap; gap:16px; align-items:baseline; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <svg width="20" height="20" viewBox="0 0 100 100" style="display:block;">
+          <polygon points="{{ logoOuter }}" fill="none" stroke="#10202F" stroke-width="5" stroke-linejoin="round"></polygon>
+          <polygon points="{{ logoInner }}" fill="#0A7D68" fill-opacity="0.85"></polygon>
+        </svg>
+        <span style="font-family:Fraunces,serif; font-weight:600; font-size:16px;">Penta<span style="color:#0A7D68;">score</span></span>
+      </div>
+      <span style="font-size:12.5px; color:rgba(16,32,47,0.42);">par CMRPI — Espace Maroc Cyberconfiance — Kénitra, Maroc</span>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;section&quot;,&quot;question&quot;],&quot;default&quot;:&quot;section&quot;,&quot;tsType&quot;:&quot;'section' | 'question'&quot;,&quot;section&quot;:&quot;Questionnaire&quot;},&quot;showGuidanceByDefault&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Questionnaire&quot;},&quot;animateScore&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Résultats&quot;}}">
+const INK = '#10202F', EMERALD = '#0A7D68', GOLD = '#A9824C', CORAL = '#D24A2E';
+
+const DOMAINS = [
+  { id: 'gov', name: 'Gouvernance', short: 'GOUV.', desc: "Politique de sécurité écrite, responsable désigné, budget dédié.", intro: "Comment la sécurité est pilotée, budgétée et suivie dans l'entreprise." },
+  { id: 'acc', name: 'Accès & Identités', short: 'ACCÈS', desc: "Authentification multi-facteurs, contrôle d'accès par rôle.", intro: "Qui peut ouvrir quoi, avec quel mot de passe, et pendant combien de temps." },
+  { id: 'inf', name: 'Infrastructure & Réseau', short: 'INFRA.', desc: "Pare-feu, chiffrement des données, postes tenus à jour.", intro: "L'état des machines, des mises à jour et de la connexion à internet." },
+  { id: 'inc', name: 'Incidents & Continuité', short: 'INCID.', desc: "Sauvegardes testées, plan de réponse, reprise d'activité.", intro: "Ce que fait l'entreprise le jour où quelque chose tourne mal." },
+  { id: 'sen', name: 'Sensibilisation', short: 'SENSIB.', desc: "Formation régulière, tests de vigilance des équipes.", intro: "Ce que vos équipes savent reconnaître, et ce qu'elles font ensuite." },
+];
+
+const Q = [
+  ['gov', "Une personne est-elle explicitement responsable de la sécurité informatique ?", "Il ne s'agit pas d'un poste à temps plein : un dirigeant ou un salarié qui a le sujet dans ses attributions écrites suffit à ce stade."],
+  ['gov', "Disposez-vous d'une politique de sécurité écrite, même courte ?", "Un document de deux pages listant les règles de base (mots de passe, clés USB, télétravail) compte comme une politique."],
+  ['gov', "Un budget est-il prévu chaque année pour la sécurité informatique ?", "Cela inclut les licences antivirus, les sauvegardes externalisées ou l'intervention d'un prestataire."],
+  ['gov', "Vos prestataires informatiques sont-ils encadrés par un contrat précisant la sécurité ?", "Le contrat doit dire qui accède à vos données, où elles sont hébergées et ce qui se passe en fin de contrat."],
+  ['gov', "Votre assurance couvre-t-elle explicitement le risque cyber ?", "La couverture cyber est rarement incluse par défaut dans un contrat multirisque professionnel."],
+
+  ['acc', "Chaque salarié dispose-t-il d'un identifiant personnel ?", "Les comptes partagés rendent impossible de savoir qui a fait quoi en cas d'incident."],
+  ['acc', "La double authentification est-elle activée sur la messagerie et les outils cloud ?", "C'est la mesure au meilleur rapport effort/protection : un mot de passe volé ne suffit plus à entrer."],
+  ['acc', "Les droits d'administrateur sont-ils limités à un petit nombre de personnes ?", "Travailler au quotidien avec un compte administrateur amplifie fortement l'impact d'une infection."],
+  ['acc', "Les accès sont-ils retirés le jour du départ d'un salarié ?", "Messagerie, cloud, VPN, badges : un départ doit déclencher une liste de retraits, pas un oubli."],
+  ['acc', "Utilisez-vous un gestionnaire de mots de passe dans l'entreprise ?", "Il évite les mots de passe réutilisés ou notés sur papier, sans effort de mémorisation."],
+
+  ['inf', "Les mises à jour de sécurité sont-elles installées sous un mois ?", "La majorité des attaques exploitent des failles corrigées depuis longtemps par l'éditeur."],
+  ['inf', "Un antivirus est-il actif et supervisé sur tous les postes ?", "Supervisé signifie que quelqu'un voit les alertes ; un antivirus installé mais jamais consulté protège peu."],
+  ['inf', "Le réseau Wi-Fi visiteurs est-il séparé du réseau de l'entreprise ?", "La séparation évite qu'un appareil personnel infecté n'atteigne vos serveurs et vos postes."],
+  ['inf', "Les accès distants (télétravail) passent-ils par une connexion sécurisée ?", "VPN d'entreprise ou solution équivalente fournie par votre prestataire, pas un bureau à distance ouvert sur internet."],
+  ['inf', "Les données sensibles sont-elles chiffrées sur les ordinateurs portables ?", "Le chiffrement du disque est intégré à Windows et macOS ; il protège les données en cas de vol du matériel."],
+
+  ['inc', "Vos données sont-elles sauvegardées automatiquement ?", "Automatique signifie sans intervention humaine, à fréquence fixe. Une copie manuelle occasionnelle ne compte pas."],
+  ['inc', "Une copie de sauvegarde est-elle conservée hors ligne ou hors site ?", "Un rançongiciel chiffre aussi les sauvegardes connectées au réseau : une copie déconnectée est ce qui vous sauve."],
+  ['inc', "Avez-vous déjà testé une restauration de sauvegarde ?", "Une sauvegarde jamais restaurée est une hypothèse, pas une garantie. Un test annuel suffit."],
+  ['inc', "Existe-t-il une procédure écrite en cas d'incident ?", "Même une page : qui décide, qui débranche quoi, qui prévient les clients et dans quel délai."],
+  ['inc', "Savez-vous en combien de temps votre activité peut redémarrer après une panne majeure ?", "Ce délai cible conditionne le type de sauvegarde et de secours dont vous avez besoin."],
+
+  ['sen', "Vos salariés sont-ils sensibilisés au moins une fois par an ?", "Une session d'une heure sur le hameçonnage et les mots de passe est le minimum recommandé pour une PME."],
+  ['sen', "Avez-vous déjà organisé un test de hameçonnage simulé ?", "Un faux courriel envoyé volontairement mesure la vigilance réelle, bien mieux qu'une formation seule."],
+  ['sen', "Les nouveaux arrivants reçoivent-ils les consignes de sécurité dès leur arrivée ?", "Dix minutes à l'intégration : règles de mots de passe, usage de la messagerie, matériel personnel."],
+  ['sen', "Vos salariés savent-ils à qui signaler un courriel ou un comportement suspect ?", "Un signalement rapide transforme un incident potentiel en simple alerte sans conséquence."],
+  ['sen', "Les dirigeants sont-ils formés aux fraudes au virement et à l'usurpation d'identité ?", "La fraude au président vise la direction et la comptabilité : elle se déjoue par une procédure de double validation."],
+];
+
+const LIKERT = ['Pas du tout', 'Plutôt non', 'En partie', 'Plutôt oui', 'Totalement'];
+
+const RECOS = {
+  gov: [
+    ["Nommer un référent sécurité et formaliser une politique courte", "Une page de règles signée par la direction, un nom en face du sujet : c'est le socle qui rend toutes les autres mesures applicables."],
+    ["Inscrire une ligne sécurité au budget annuel", "Antivirus supervisé, sauvegarde externalisée, audit : un montant identifié évite les arbitrages dans l'urgence."],
+    ["Vérifier la couverture cyber de votre contrat d'assurance", "Rarement incluse par défaut ; l'extension coûte peu au regard du coût moyen d'un arrêt d'activité."],
+  ],
+  acc: [
+    ["Activer la double authentification sur la messagerie et le cloud", "Mesure la plus efficace à court terme : un mot de passe volé ne suffit alors plus à accéder à vos données."],
+    ["Formaliser le retrait des accès au départ d'un salarié", "Une liste de contrôle en cinq lignes, déclenchée par les RH, ferme la porte la plus souvent laissée ouverte."],
+    ["Déployer un gestionnaire de mots de passe d'équipe", "Il supprime d'un coup les mots de passe réutilisés, partagés par courriel ou notés sur papier."],
+  ],
+  inf: [
+    ["Automatiser l'installation des mises à jour de sécurité", "La plupart des intrusions passent par une faille corrigée depuis des mois. L'automatisation supprime le facteur oubli."],
+    ["Séparer le réseau visiteurs du réseau de production", "Une configuration à faire une fois chez votre prestataire, qui isole durablement vos serveurs des appareils non maîtrisés."],
+    ["Activer le chiffrement de disque sur tous les portables", "Fonction native de Windows et macOS : un ordinateur volé devient inexploitable, sans coût de licence."],
+  ],
+  inc: [
+    ["Mettre en place une sauvegarde automatique avec copie hors ligne", "Sans copie déconnectée du réseau, un rançongiciel emporte aussi vos sauvegardes. C'est l'action la plus rentable du plan."],
+    ["Tester une restauration complète avant la fin du trimestre", "Une sauvegarde jamais restaurée n'est pas une sauvegarde : le test révèle presque toujours un fichier manquant."],
+    ["Rédiger une fiche réflexe incident d'une page", "Qui décide, qui débranche, qui prévient : affichée hors du système informatique, elle fait gagner les premières heures."],
+  ],
+  sen: [
+    ["Programmer une sensibilisation annuelle des équipes", "Une heure par an sur le hameçonnage et les mots de passe réduit fortement le risque d'entrée par la messagerie."],
+    ["Lancer un test de hameçonnage simulé", "Il donne une mesure chiffrée de la vigilance réelle et rend la formation suivante beaucoup plus concrète."],
+    ["Instaurer une double validation des virements", "Deux personnes pour tout virement inhabituel : la parade la plus simple à la fraude au président."],
+  ],
+};
+
+const DEMOS = [
+  { key: 'fin', name: 'PME Finance', sector: 'Finance', vals: [3,3,2,3,1, 3,2,2,2,1, 3,3,2,2,2, 2,1,1,2,2, 2,1,2,2,1] },
+  { key: 'com', name: 'PME Commerce', sector: 'Commerce', vals: [1,1,2,1,1, 2,1,2,1,1, 2,2,1,1,1, 2,1,1,1,1, 1,1,1,2,1] },
+  { key: 'tec', name: 'PME Technologie', sector: 'Technologie', vals: [4,5,4,4,3, 5,5,4,4,5, 5,4,4,5,4, 4,4,4,4,3, 4,3,4,4,3] },
+];
+
+function pent(cx, cy, r, i) {
+  const a = (-90 + i * 72) * Math.PI / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+function pentPoints(cx, cy, r) {
+  return [0, 1, 2, 3, 4].map(i => { const p = pent(cx, cy, r, i); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+}
+function levelOf(s) {
+  if (s < 25) return 'Critique';
+  if (s < 50) return 'Faible';
+  if (s < 75) return 'Moyenne';
+  return 'Avancée';
+}
+function colorOf(s) { return s < 25 ? CORAL : s < 50 ? GOLD : EMERALD; }
+function scoresFrom(answers) {
+  const out = {};
+  DOMAINS.forEach(d => {
+    const idx = Q.map((q, i) => [q[0], i]).filter(p => p[0] === d.id).map(p => p[1]);
+    const vals = idx.map(i => answers[i]).filter(v => typeof v === 'number');
+    out[d.id] = vals.length ? ((vals.reduce((a, b) => a + b, 0) / vals.length - 1) / 4) * 100 : 0;
+  });
+  return out;
+}
+function globalOf(answers) {
+  const s = scoresFrom(answers);
+  return DOMAINS.reduce((a, d) => a + s[d.id], 0) / 5;
+}
+
+class Component extends DCLogic {
+  state = { screen: 'landing', orgName: '', sector: 'Services & conseil', mode: 'section', step: 0, answers: {}, guidance: {}, anim: 0, statAnim: 0, exported: false };
+
+  componentDidMount() {
+    if (this.props.defaultMode === 'question') this.setState({ mode: 'question' });
+    this.ramp('statAnim', 1300);
+  }
+
+  ramp(key, dur) {
+    if (document.hidden || this.props.animateScore === false) { this.setState({ [key]: 1 }); return; }
+    const t0 = performance.now();
+    const tick = t => {
+      const k = Math.min(1, (t - t0) / dur);
+      this.setState({ [key]: 1 - Math.pow(1 - k, 3) });
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    this.setState({ [key]: 0 });
+    requestAnimationFrame(tick);
+    clearTimeout(this['_t_' + key]);
+    this['_t_' + key] = setTimeout(() => this.setState({ [key]: 1 }), dur + 400);
+  }
+
+  showResults(patch) {
+    window.scrollTo(0, 0);
+    this.setState(Object.assign({ screen: 'results', exported: false }, patch || {}));
+    this.ramp('anim', 1100);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._t_anim);
+    clearTimeout(this._t_statAnim);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const scores = scoresFrom(st.answers);
+    const global = globalOf(st.answers);
+    const guidanceDefault = this.props.showGuidanceByDefault === true;
+
+    const qIndexes = st.mode === 'section'
+      ? Q.map((q, i) => [q[0], i]).filter(p => p[0] === DOMAINS[st.step].id).map(p => p[1])
+      : [st.step];
+    const curDomainId = st.mode === 'section' ? DOMAINS[st.step].id : Q[st.step][0];
+    const curDomainIdx = DOMAINS.findIndex(d => d.id === curDomainId);
+
+    const visibleQuestions = qIndexes.map(i => {
+      const open = st.guidance[i] === undefined ? guidanceDefault : st.guidance[i];
+      return {
+        num: String(i + 1).padStart(2, '0'),
+        text: Q[i][1], guidance: Q[i][2], guidanceOpen: open,
+        guidanceLabel: open ? "Masquer l'aide" : "Que faut-il comprendre ?",
+        size: st.mode === 'question' ? '24px' : '17px',
+        toggleGuidance: () => this.setState(s => ({ guidance: Object.assign({}, s.guidance, { [i]: !open }) })),
+        choices: LIKERT.map((label, k) => {
+          const v = k + 1, sel = st.answers[i] === v;
+          return { label, value: v, bg: sel ? EMERALD : 'transparent', fg: sel ? '#FAF8F2' : INK, border: sel ? EMERALD : 'rgba(16,32,47,0.20)',
+            onClick: () => this.setState(s => ({ answers: Object.assign({}, s.answers, { [i]: v }) })) };
+        }),
+      };
+    });
+
+    const answered = Object.keys(st.answers).length;
+    const total = st.mode === 'section' ? DOMAINS.length : Q.length;
+    const allAnswered = qIndexes.every(i => typeof st.answers[i] === 'number');
+    const last = st.step === total - 1;
+
+    const heroScores = [50, 55, 35, 50, 30];
+    const heroPts = heroScores.map((v, i) => pent(210, 210, 150 * (v / 100), i));
+    const radarPts = DOMAINS.map((d, i) => pent(200, 185, 22 + (scores[d.id] / 100) * 118 * st.anim, i));
+
+    const weak = DOMAINS.slice().sort((a, b) => scores[a.id] - scores[b.id]);
+    const recommendations = weak.slice(0, 3).map((d, i) => {
+      const s = scores[d.id];
+      const pick = RECOS[d.id][i % RECOS[d.id].length];
+      return { rank: String(i + 1).padStart(2, '0'), title: pick[0], detail: pick[1],
+        domain: d.name + ' · ' + Math.round(s) + '/100',
+        severity: s < 25 ? 'Critique' : s < 50 ? 'Élevée' : s < 75 ? 'Moyenne' : 'Surveillance',
+        sevColor: s < 25 ? CORAL : s < 50 ? GOLD : EMERALD };
+    });
+
+    const hist = [['Mars 2025', 34], ['Juillet 2025', 46], ['Décembre 2025', 55], ['Mai 2026', Math.round(global)]];
+    const hx = i => 120 + i * 245;
+    const hy = v => 180 - (v / 100) * 145;
+
+    const summary = global < 25
+      ? "Les fondamentaux ne sont pas en place. Le risque d'un arrêt d'activité prolongé après un incident est élevé — trois actions suffisent à sortir de cette zone."
+      : global < 50
+        ? "Des mesures existent mais restent partielles et peu formalisées. L'écart se comble surtout par de l'organisation, pas par de l'investissement."
+        : global < 75
+          ? "Le socle est solide. Les points restants sont ciblés et se traitent domaine par domaine, sans refonte."
+          : "Niveau de maîtrise supérieur à la moyenne du secteur. L'enjeu devient le maintien dans la durée et le test régulier des dispositifs.";
+
+    return {
+      isLanding: st.screen === 'landing', isStart: st.screen === 'start', isQuiz: st.screen === 'quiz',
+      isResults: st.screen === 'results', isHistory: st.screen === 'history', isApp: st.screen !== 'landing',
+      stepLabel: st.screen === 'start' ? 'Préparation' : st.screen === 'quiz' ? (st.mode === 'section' ? 'Domaine ' + (st.step + 1) + '/5' : 'Question ' + (st.step + 1) + '/25') : st.screen === 'results' ? 'Résultats' : 'Historique',
+      goLanding: () => { window.scrollTo(0, 0); this.setState({ screen: 'landing' }); },
+      goStart: () => { window.scrollTo(0, 0); this.setState({ screen: 'start' }); },
+
+      logoOuter: pentPoints(50, 52, 42),
+      logoInner: [0.55, 0.85, 0.4, 0.7, 0.5].map((f, i) => { const p = pent(50, 52, 42 * f, i); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' '),
+
+      heroRings: [0.25, 0.5, 0.75, 1].map(f => ({ points: pentPoints(210, 210, 150 * f) })),
+      heroSpokes: DOMAINS.map((d, i) => { const p = pent(210, 210, 150, i); return { x: p.x.toFixed(1), y: p.y.toFixed(1) }; }),
+      heroShape: heroPts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' '),
+      heroPoints: heroPts.map(p => ({ x: p.x.toFixed(1), y: p.y.toFixed(1) })),
+
+      stats: [
+        { value: Math.round(60 * st.statAnim), suffix: '%', label: "des cyberattaques recensées au Maroc visent des PME, pas des grands groupes.", source: 'DGSSI, 2025' },
+        { value: Math.round(879 * st.statAnim), suffix: '', label: "cyberattaques traitées par la DGSSI en 2025, dont 109 avec intervention du maCERT.", source: 'DGSSI, rapport annuel 2025' },
+        { value: 'Tier 1', suffix: '', label: "classement mondial du Maroc à l'indice de cybersécurité de l'ITU — 97,5/100.", source: 'ITU, 2024' },
+      ],
+
+      domRings: [0.33, 0.66, 1].map(f => ({ points: pentPoints(200, 200, 150 * f) })),
+      domSpokes: DOMAINS.map((d, i) => { const p = pent(200, 200, 150, i); return { x: p.x.toFixed(1), y: p.y.toFixed(1) }; }),
+      domInner: pentPoints(200, 200, 93),
+      domLabels: DOMAINS.map((d, i) => { const p = pent(200, 200, 174, i); return { left: (p.x / 400 * 100).toFixed(2) + '%', top: (p.y / 400 * 100).toFixed(2) + '%', text: d.short }; }),
+      domainList: DOMAINS.map((d, i) => ({ num: String(i + 1).padStart(2, '0'), name: d.name, desc: d.desc })),
+
+      demoProfiles: DEMOS.map(d => {
+        const ans = {}; d.vals.forEach((v, i) => { ans[i] = v; });
+        const g = Math.round(globalOf(ans));
+        return { name: d.name, sector: d.sector, score: g + '/100', level: levelOf(g), color: colorOf(g),
+          onClick: () => this.showResults({ answers: ans, orgName: d.name, sector: d.sector }) };
+      }),
+
+      orgName: st.orgName, onOrgChange: e => this.setState({ orgName: e.target.value }),
+      sector: st.sector, onSectorChange: e => this.setState({ sector: e.target.value }),
+      sectors: ['Services & conseil', 'Commerce & distribution', 'Industrie', 'Finance', 'Technologie', 'Artisanat & BTP', 'Santé', 'Transport & logistique'],
+      modeOptions: [
+        { title: 'Par domaine', detail: '5 écrans · le plus rapide', bg: st.mode === 'section' ? INK : 'transparent', fg: st.mode === 'section' ? '#FAF8F2' : INK, onClick: () => this.setState({ mode: 'section', step: 0 }) },
+        { title: 'Question par question', detail: '25 écrans · le plus guidé', bg: st.mode === 'question' ? INK : 'transparent', fg: st.mode === 'question' ? '#FAF8F2' : INK, onClick: () => this.setState({ mode: 'question', step: 0 }) },
+      ],
+      startAudit: () => { window.scrollTo(0, 0); this.setState({ screen: 'quiz', step: 0 }); },
+
+      quizCounter: st.mode === 'section' ? 'Domaine ' + (st.step + 1) + ' sur 5' : 'Question ' + (st.step + 1) + ' sur 25',
+      quizTitle: DOMAINS[curDomainIdx].name,
+      quizIntro: DOMAINS[curDomainIdx].intro,
+      visibleQuestions,
+      navOutline: pentPoints(70, 66, 46),
+      navProgressPath: DOMAINS.slice(0, curDomainIdx + 1).map((d, i) => { const p = pent(70, 66, 46, i); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' '),
+      navDots: DOMAINS.map((d, i) => {
+        const p = pent(70, 66, 46, i);
+        const done = Q.map((q, k) => [q[0], k]).filter(x => x[0] === d.id).every(x => typeof st.answers[x[1]] === 'number');
+        const cur = i === curDomainIdx;
+        return { x: p.x.toFixed(1), y: p.y.toFixed(1), r: cur ? 7 : 5, fill: done ? EMERALD : '#FAF8F2', stroke: cur || done ? EMERALD : 'rgba(16,32,47,0.28)' };
+      }),
+      navLabels: DOMAINS.map((d, i) => ({ name: d.name, color: i === curDomainIdx ? INK : 'rgba(16,32,47,0.45)', weight: i === curDomainIdx ? 500 : 400 })),
+      answeredLabel: answered + '/25 répondu',
+      nextLabel: last ? 'Voir mes résultats' : (st.mode === 'section' ? 'Domaine suivant' : 'Question suivante'),
+      nextBg: allAnswered ? EMERALD : 'rgba(16,32,47,0.28)',
+      goNext: () => {
+        if (!allAnswered) return;
+        window.scrollTo(0, 0);
+        if (last) this.showResults(); else this.setState({ step: st.step + 1 });
+      },
+      backLabel: st.step === 0 ? 'Revenir à la préparation' : 'Précédent',
+      goBack: () => { window.scrollTo(0, 0); st.step === 0 ? this.setState({ screen: 'start' }) : this.setState({ step: st.step - 1 }); },
+
+      resultHeader: (st.orgName || 'Votre organisation') + ' · ' + st.sector + ' · mai 2026',
+      animatedScore: Math.round(global * st.anim),
+      maturityLevel: levelOf(global).toLowerCase(),
+      maturityColor: colorOf(global),
+      maturitySummary: summary,
+      radarRings: [0.25, 0.5, 0.75, 1].map(f => ({ points: pentPoints(200, 185, 22 + 118 * f) })),
+      radarSpokes: DOMAINS.map((d, i) => { const p = pent(200, 185, 140, i); return { x: p.x.toFixed(1), y: p.y.toFixed(1) }; }),
+      radarShape: radarPts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' '),
+      radarPoints: radarPts.map(p => ({ x: p.x.toFixed(1), y: p.y.toFixed(1) })),
+      radarLabels: DOMAINS.map((d, i) => {
+        const p = pent(200, 185, 166, i);
+        return { left: (p.x / 400 * 100).toFixed(2) + '%', top: (p.y / 380 * 100).toFixed(2) + '%', name: d.short, score: Math.round(scores[d.id]), color: colorOf(scores[d.id]) };
+      }),
+      domainRows: DOMAINS.map(d => ({ name: d.name, score: Math.round(scores[d.id]), level: levelOf(scores[d.id]), color: colorOf(scores[d.id]), width: (scores[d.id] * st.anim).toFixed(1) + '%' })),
+      recommendations,
+      exportPdf: () => this.setState({ exported: true }),
+      exportLabel: st.exported ? 'rapport_pentascore_mai2026.pdf · 6 pages' : '',
+      goHistory: () => { window.scrollTo(0, 0); this.setState({ screen: 'history' }); },
+      goResults: () => { window.scrollTo(0, 0); this.setState({ screen: 'results' }); },
+
+      orgLabel: st.orgName || 'Votre organisation',
+      historySummary: 'Progression de ' + (Math.round(global) - 34 >= 0 ? '+' : '') + (Math.round(global) - 34) + ' points en quatorze mois. La sauvegarde hors ligne et la double authentification expliquent l\'essentiel du gain.',
+      historyGrid: [0, 50, 100].map(v => ({ y: hy(v).toFixed(1), top: (hy(v) / 230 * 100).toFixed(2) + '%', label: v })),
+      historyPath: hist.map((h, i) => hx(i).toFixed(1) + ',' + hy(h[1]).toFixed(1)).join(' '),
+      historyPoints: hist.map((h, i) => ({ x: hx(i).toFixed(1), y: hy(h[1]).toFixed(1), left: (hx(i) / 900 * 100).toFixed(2) + '%', scoreTop: ((hy(h[1]) - 10) / 230 * 100).toFixed(2) + '%', score: h[1], date: h[0] })),
+      historyRows: hist.slice().reverse().map((h, i, arr) => {
+        const prev = arr[i + 1];
+        const delta = prev ? h[1] - prev[1] : null;
+        return { date: h[0], note: i === 0 ? 'Audit en cours' : 'Audit archivé', score: h[1], level: levelOf(h[1]), color: colorOf(h[1]),
+          delta: delta === null ? '—' : (delta >= 0 ? '+' : '') + delta, deltaColor: delta === null ? 'rgba(16,32,47,0.40)' : delta >= 0 ? EMERALD : CORAL };
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

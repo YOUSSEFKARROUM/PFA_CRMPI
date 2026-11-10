@@ -1,17 +1,19 @@
 """
-database.py — Couche d'accès aux données (SQLite) pour la plateforme CMRPI.
+database.py — Couche d'accès aux données (SQLite) de Pentascore.
 
 Fournit les opérations CRUD pour : PME (utilisateurs), audits, réponses,
 domaines, questions et recommandations.
 """
+import os
 import sqlite3
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from contextlib import contextmanager
 
-DB_PATH = Path(__file__).resolve().parent.parent / "app.db"
+DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "app.db"
+DB_PATH = Path(os.environ.get("PENTASCORE_DB_PATH") or DEFAULT_DB_PATH)
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "data" / "schema.sql"
 
 
@@ -29,11 +31,27 @@ def get_connection():
 
 
 def init_database():
-    """Initialise la base de données à partir du schéma SQL."""
+    """Initialise la base de données à partir du schéma SQL, puis applique les migrations."""
     with get_connection() as conn:
         with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
             conn.executescript(f.read())
+        _migrate(conn)
     return True
+
+
+def _migrate(conn):
+    """Migrations idempotentes pour les bases créées avec un schéma antérieur."""
+    pme_columns = {row["name"] for row in conn.execute("PRAGMA table_info(pme)")}
+    if "consent_at" not in pme_columns:
+        conn.execute("ALTER TABLE pme ADD COLUMN consent_at DATETIME")
+    recommendation_columns = {row["name"] for row in conn.execute("PRAGMA table_info(recommendation)")}
+    for column, sql_type in (("guide_ref", "TEXT"), ("question_id", "TEXT"), ("trigger_max", "INTEGER")):
+        if column not in recommendation_columns:
+            conn.execute(f"ALTER TABLE recommendation ADD COLUMN {column} {sql_type}")
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def new_uuid() -> str:
@@ -44,14 +62,26 @@ def new_uuid() -> str:
 # PME (utilisateurs)
 # ============================================================
 
-def create_pme(email: str, password_hash: str, name: str, sector: str = None) -> str:
+def create_pme(email: str, password_hash: str, name: str, sector: str = None, consent_at: str = None) -> str:
     pme_id = new_uuid()
     with get_connection() as conn:
         conn.execute(
-            "INSERT INTO pme (id, email, password_hash, name, sector) VALUES (?, ?, ?, ?, ?)",
-            (pme_id, email, password_hash, name, sector),
+            "INSERT INTO pme (id, email, password_hash, name, sector, consent_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (pme_id, email, password_hash, name, sector, consent_at),
         )
     return pme_id
+
+
+def delete_pme(pme_id: str) -> bool:
+    """Supprime une PME et toutes ses données (droit de suppression, loi 09-08)."""
+    with get_connection() as conn:
+        audit_ids = [r["id"] for r in conn.execute("SELECT id FROM audit WHERE pme_id = ?", (pme_id,))]
+        for audit_id in audit_ids:
+            conn.execute("DELETE FROM audit_response WHERE audit_id = ?", (audit_id,))
+        conn.execute("DELETE FROM audit WHERE pme_id = ?", (pme_id,))
+        conn.execute("DELETE FROM audit_log WHERE pme_id = ?", (pme_id,))
+        deleted = conn.execute("DELETE FROM pme WHERE id = ?", (pme_id,)).rowcount
+    return deleted > 0
 
 
 def get_pme_by_email(email: str):
@@ -135,7 +165,11 @@ def get_all_domains():
 # ============================================================
 
 def seed_recommendations_from_xlsx(xlsx_path: str):
-    """Charge les recommandations depuis le fichier Excel (une feuille par domaine)."""
+    """
+    Charge les recommandations depuis le fichier Excel (une feuille par domaine).
+    Colonnes : ID, Severite, Priorite, Texte_FR, Texte_EN, Reference (ISO/IEC 27001:2022),
+    Effort, Guide_AUSIM_CMRPI_2018, Question, Seuil.
+    """
     import openpyxl
 
     domain_sheet_map = {
@@ -155,15 +189,23 @@ def seed_recommendations_from_xlsx(xlsx_path: str):
             for row in ws.iter_rows(min_row=4, values_only=True):
                 if not row or row[0] is None:
                     continue
-                rec_id, severity, priority, text_fr, text_en, reference, effort = (list(row) + [None] * 7)[:7]
+                (rec_id, severity, priority, text_fr, text_en, reference, effort,
+                 guide_ref, question_id, trigger_max) = (list(row) + [None] * 10)[:10]
                 conn.execute(
                     """INSERT OR REPLACE INTO recommendation
-                       (id, domain_id, severity, priority, text_fr, text_en, reference, effort)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (rec_id, domain_id, severity, priority, text_fr, text_en or text_fr, reference, effort),
+                       (id, domain_id, severity, priority, text_fr, text_en, reference, effort,
+                        guide_ref, question_id, trigger_max)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (rec_id, domain_id, severity, priority, text_fr, text_en or text_fr, reference, effort,
+                     guide_ref, question_id, int(trigger_max) if trigger_max is not None else None),
                 )
                 count += 1
     return count
+
+
+def count_recommendations() -> int:
+    with get_connection() as conn:
+        return conn.execute("SELECT COUNT(*) FROM recommendation").fetchone()[0]
 
 
 def get_recommendations_for_domain(domain_id: str, severities: list):
@@ -199,11 +241,30 @@ def save_response(audit_id: str, question_id: str, response: int, domain_score: 
         )
 
 
+def save_completed_audit(pme_id: str, responses: list, global_score: float) -> str:
+    """
+    Enregistre une évaluation complète en une seule transaction (tout ou rien).
+    responses: [(question_id, réponse 1-5, score du domaine), ...]
+    """
+    audit_id = new_uuid()
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT INTO audit (id, pme_id, questionnaire_version, global_score, completed_at) "
+            "VALUES (?, ?, '1.0', ?, ?)",
+            (audit_id, pme_id, global_score, _utc_now()),
+        )
+        conn.executemany(
+            "INSERT INTO audit_response (id, audit_id, question_id, response, domain_score) VALUES (?, ?, ?, ?, ?)",
+            [(new_uuid(), audit_id, qid, value, score) for qid, value, score in responses],
+        )
+    return audit_id
+
+
 def complete_audit(audit_id: str, global_score: float):
     with get_connection() as conn:
         conn.execute(
             "UPDATE audit SET global_score = ?, completed_at = ? WHERE id = ?",
-            (global_score, datetime.utcnow().isoformat(), audit_id),
+            (global_score, _utc_now(), audit_id),
         )
 
 
@@ -226,6 +287,19 @@ def get_audit_responses(audit_id: str):
             (audit_id,),
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+def get_audit_domain_scores(audit_id: str) -> dict:
+    """Retourne {domain_id: score} tel qu'enregistré avec les réponses de l'audit."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT q.domain_id, MAX(ar.domain_score) AS score FROM audit_response ar
+               JOIN question q ON ar.question_id = q.id
+               WHERE ar.audit_id = ? AND ar.domain_score IS NOT NULL
+               GROUP BY q.domain_id ORDER BY MIN(q.display_order)""",
+            (audit_id,),
+        ).fetchall()
+        return {r["domain_id"]: r["score"] for r in rows}
 
 
 def log_action(pme_id: str, action: str, details: str = ""):
