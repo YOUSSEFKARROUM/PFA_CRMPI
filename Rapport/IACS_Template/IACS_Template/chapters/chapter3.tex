@@ -151,13 +151,13 @@ Le modèle de données repose sur sept tables : \texttt{pme}, \texttt{domain}, \
     \node[entity, below=1.4cm of audit] (question) {question};
     \node[entity, left=2.4cm of question] (domain) {domain};
     \node[entity, right=2.4cm of question] (reco) {recommendation};
-    \node[entity, below=1.4cm of pme] (log) {audit\_log};
+    \node[entity, above=1cm of audit] (log) {audit\_log};
 
     \draw[arrow] (pme) -- node[rel, above]{1..N} (audit);
     \draw[arrow] (audit) -- node[rel, above]{25} (response);
     \draw[arrow] (question) -- node[rel, right]{} (response);
     \draw[arrow] (domain) -- node[rel, above]{5} (question);
-    \draw[arrow] (domain) -- (reco);
+    \draw[arrow] (domain) to[bend right=28] (reco);
     \draw[arrow] (audit) -- (log);
   \end{tikzpicture}
   \caption{Diagramme entité-association simplifié du schéma de données}
@@ -324,15 +324,16 @@ Huit diagrammes UML ont été produits au Jalon~1 (Mermaid.js) afin de formalise
 
     % Système
     \draw[iacsTeal, rounded corners=8pt, thick]
-      (3, 1) rectangle (7.5, -5.5);
+      (2.4, 1.7) rectangle (8.1, -5.5);
     \node[font=\footnotesize\sffamily\bfseries\color{iacsTeal}]
-      at (5.25, 0.7) {Plateforme d'auto-évaluation};
+      at (5.25, 1.3) {Plateforme d'auto-évaluation};
   \end{tikzpicture}
   \caption{Diagramme de cas d'utilisation (version simplifiée)}
   \label{fig:use_case}
 \end{figure}
 
 % -------------------------------------------------------
+\clearpage
 \section{Réalisation}
 \label{sec:realisation}
 
@@ -567,7 +568,7 @@ Le module \texttt{consistency\_checker.py} charge et valide les 30 règles de co
   \label{tab:tests}
   \renewcommand{\arraystretch}{1.3}
   \small
-  \begin{tabularx}{\textwidth}{|l|c|X|}
+  \begin{tabularx}{\textwidth}{|l|c|>{\raggedright\arraybackslash}X|}
     \hline
     \rowcolor{iacsTableHead}
     \textcolor{white}{\textbf{Fichier}} &
@@ -642,6 +643,7 @@ Pentascore est un premier repère, pas encore une référence :
 \end{itemize}
 
 % -------------------------------------------------------
+\clearpage
 \section{Perspectives d'amélioration}
 \label{sec:perspectives}
 

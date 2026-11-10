@@ -45,7 +45,7 @@ Le tableau~\ref{tab:domaines} présente les cinq domaines retenus pour structure
   \caption{Les 5 domaines du questionnaire et leur correspondance normative}
   \label{tab:domaines}
   \renewcommand{\arraystretch}{1.4}
-  \begin{tabularx}{\textwidth}{|c|X|c|c|}
+  \begin{tabularx}{\textwidth}{|c|>{\raggedright\arraybackslash}p{3.1cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{3cm}|}
     \hline
     \rowcolor{iacsTableHead}
     \textcolor{white}{\textbf{\#}} &
@@ -72,9 +72,9 @@ Le tableau~\ref{tab:domaines} présente les cinq domaines retenus pour structure
 
 \hspace{1cm}Le choix d'un questionnaire structuré en cinq domaines de cinq questions chacun, soit 25 questions au total, repose sur deux fondements académiques et une décision de conception assumée.
 
-\textbf{Fondements issus du CMM/CMMI.} Le modèle de maturité par paliers proposé par Humphrey~\cite{humphrey1989} dans \textit{Managing the Software Process} définit cinq niveaux de maturité croissants. Cette structuration en cinq niveaux a directement inspiré la définition des cinq seuils de maturité utilisés dans le moteur de scoring de la plateforme (voir chapitre~\ref{chap:conception}, section~\ref{sec:scoring}).
+\textbf{Fondements issus du CMM/CMMI.} Le modèle de maturité par paliers proposé par Humphrey~\cite{humphrey1989} dans \textit{Managing the Software Process} définit cinq niveaux de maturité croissants. Cette structuration en paliers a inspiré les niveaux de maturité du moteur de scoring : quatre niveaux (Critique, Faible, Moyen, Avancé), séparés par trois seuils réguliers (25, 50 et 75), ont été retenus pour rester lisibles par un dirigeant (voir chapitre~\ref{chap:conception}, section~\ref{sec:scoring}).
 
-\textbf{Échelle de Likert à cinq niveaux.} Les travaux de Dawes~\cite{dawes2008} sur la comparaison des échelles de Likert à 5, 7 et 10 points montrent qu'une échelle à cinq niveaux constitue un compromis optimal entre simplicité de réponse et granularité de l'information recueillie, en particulier pour un public non spécialiste. Ce résultat a motivé le choix d'une échelle de Likert à cinq niveaux pour chaque question du questionnaire, avec des libellés contextualisés propres à chaque question plutôt qu'une simple graduation numérique de 1 à 5.
+\textbf{Échelle de Likert à cinq niveaux.} Les travaux de Dawes~\cite{dawes2008} sur la comparaison des échelles de Likert à 5, 7 et 10 points montrent que les échelles à 5 et à 7 points donnent des résultats comparables une fois ramenés à la même échelle. L'échelle à cinq niveaux offre donc un bon compromis entre simplicité de réponse et granularité, en particulier pour un public non spécialiste. Ce résultat a motivé le choix d'une échelle de Likert à cinq niveaux pour chaque question du questionnaire, avec des libellés contextualisés propres à chaque question plutôt qu'une simple graduation numérique de 1 à 5.
 
 \textbf{Décision de conception sur le nombre de questions.} Le choix de cinq questions par domaine, plutôt qu'un nombre plus élevé, résulte d'un arbitrage assumé entre la couverture de chaque domaine et la longueur totale du parcours pour un public non spécialiste (dirigeants de \gls{pme}) : au-delà du minimum généralement recommandé de trois items pour caractériser une dimension de manière stable, cinq questions par domaine permettent de couvrir les principales pratiques du guide \gls{cmrpi}/\gls{ausim} sans dépasser un total de 25 questions, jugé raisonnable pour un outil d'auto-évaluation complété en une seule session.
 
